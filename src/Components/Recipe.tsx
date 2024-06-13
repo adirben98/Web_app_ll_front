@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons'
 import Comment,{IComment} from "./Comment";
 import CommentCreate from "./CommentCreate";
-import user from '../Services/user-service';
+import User from '../Services/user-service';
 
 
 
@@ -150,16 +150,18 @@ export default function Recipe() {
         <p>{recipe.instructions}</p>
         </div>
         <h2>Comments</h2>
-        <CommentCreate author={user.username} recipeId="6669866c8369a34d2f140a13" token={user.accessToken} handle={()=>{setRenderNeeded(true)}}/>
+        <CommentCreate author={User.getUser()!} recipeId="6669866c8369a34d2f140a13" token={User.getToken()!} handle={()=>{renderNeeded?setRenderNeeded(false):setRenderNeeded(true)}}/>
         <div>
           {Comments.map((comment, index) => (
             <Comment
               key={index}
+              _id={comment._id}
               author={comment.author}
               content={comment.content}
               recipeId={comment.recipeId}
               createdAt={comment.createdAt}
               edited={comment.edited}
+              onUpdateHandler={()=>{renderNeeded?setRenderNeeded(false):setRenderNeeded(true)}}
             />
           ))}
         </div>

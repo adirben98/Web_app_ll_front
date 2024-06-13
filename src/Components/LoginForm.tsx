@@ -4,7 +4,10 @@ import apiClient from '../Services/api-client';
 export default function LoginForm() {
     interface IUser{
         email:string;
+        username:string;
         password:string;
+        accessToken?:string;
+        refreshToken?:string;
     }
 
     function login(){
@@ -12,7 +15,10 @@ export default function LoginForm() {
         
         apiClient("").post<IUser>("auth/login",{email:watch("email"),password:watch("password")}).then((response)=>{
             console.log(response);
-            localStorage.setItem('user',JSON.stringify(response.data));
+            localStorage.setItem('username',response.data.username);
+            localStorage.setItem('token',response.data.accessToken!);
+
+
         }).catch(()=>{
             setError("password",{message:"Invalid Email or Password"})
         })
