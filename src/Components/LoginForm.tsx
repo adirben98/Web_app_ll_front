@@ -10,8 +10,9 @@ export default function LoginForm() {
     function login(){
         console.log("login")
         
-        apiClient.post<IUser>("auth/login",{email:watch("email"),password:watch("password")}).then((response)=>{
+        apiClient("").post<IUser>("auth/login",{email:watch("email"),password:watch("password")}).then((response)=>{
             console.log(response);
+            localStorage.setItem('user',JSON.stringify(response.data));
         }).catch(()=>{
             setError("password",{message:"Invalid Email or Password"})
         })

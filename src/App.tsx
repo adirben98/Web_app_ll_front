@@ -1,12 +1,13 @@
+//import LoginForm from './Components/LoginForm';
+import Recipe from './Components/Recipe';
 
-import LoginForm from './Components/LoginForm'
 
 function App() {
   
 
   return (
     <>
-    <LoginForm/>
+    <Recipe/>
     </>
   )
 }

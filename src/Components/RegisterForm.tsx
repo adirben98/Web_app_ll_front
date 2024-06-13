@@ -5,21 +5,21 @@ import { faImage } from '@fortawesome/free-solid-svg-icons'
 import  uploadPhoto  from '../Services/file-service'
 import { useForm } from "react-hook-form"
 import apiClient from '../Services/api-client';
+import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import { IUser, registrUser } from '../Services/register-service';
 
 export default  function RegisterForm () {
 
 const {register, handleSubmit, formState:{errors}, setError, watch} = useForm<IUser>();
 
-interface IUser {
-  email: string;
-  imgUrl: string;
-  username: string;
-  password: string;
-}
+const token=process.env.REACT_APP_ACCESS_TOKEN!;
 
 
   async function Register() {
-    const url=await uploadPhoto(image!);
+    let url="";
+    if(image)
+      url=await uploadPhoto(image!);
+    
 
     const user:IUser = {
 
@@ -29,13 +29,12 @@ interface IUser {
       password: watch("password")
 
     }
-    try {
-      const res = await apiClient.post("auth/register", user);
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+    registrUser(user).then((data) =>{console.log(data);
+      }).catch((error) => {
+        console.log(error);
+    
+  })
+}
 
   function handleClick() {
     photoGalleryRef.current?.click();
@@ -44,7 +43,7 @@ interface IUser {
 
   async function checkEmail(email:string){
     try {
-      await apiClient.post("auth/isEmailTaken", {
+      await apiClient(token).post("auth/isEmailTaken", {
         email: email
       });
   
@@ -52,6 +51,19 @@ interface IUser {
     } catch (error) {
       setError("email", { message: "This Email is Already Taken" });
     }
+  }
+  async function onSuccess(response:CredentialResponse){
+    try{
+    const res=await apiClient(token).post("auth/googleLogin", {
+      credentials:response.credential
+    })
+    console.log(res);
+    }catch(error){
+      console.log(error);
+    }
+  }
+  function onError(){
+    console.log();
   }
   
   const [image, setImage] = React.useState<File>();
@@ -64,7 +76,7 @@ interface IUser {
     <form onSubmit={handleSubmit(Register)}>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <div className="register-form" style={{ width: '300px' }}>
-          <h1 style={{textAlign:'center'}}>Register</h1>
+          <h1 style={{textAlign:'center', marginBottom:"50px"}}>Register</h1>
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <img src={image ? URL.createObjectURL(image):avatar} alt="Avatar" style={{ width: '100px', height: '100px' }} />
           </div>
@@ -94,7 +106,10 @@ interface IUser {
             <label htmlFor="password">Password</label>
             {errors.password && <span>{errors.password.message}</span>}
           </div>
-          <button className="btn btn-primary mt-3" >Register</button>
+          <div style={{  display:"flex",justifyContent: 'space-between',alignItems: 'center',marginTop:"25px" }}>
+            <button className="btn btn-primary" >Register</button>
+            <GoogleLogin onSuccess={onSuccess} onError={onError}/>
+          </div>
         </div>
       </div>
     </form>
