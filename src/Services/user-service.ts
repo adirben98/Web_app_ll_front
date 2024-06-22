@@ -1,10 +1,13 @@
-
 function getUser(){
-const user=localStorage.getItem('username')
-    return user
+const username=localStorage.getItem('username')
+const userImg=localStorage.getItem('userImg')
+const accessToken=localStorage.getItem('token')
+
+    return {
+        username:username,
+        userImg:userImg,
+        accessToken:accessToken
+    }
 }
-function getToken(){
-    const token=localStorage.getItem('token')
-    return token
-}
-export default {getUser, getToken}
+
+export default {getUser}

@@ -8,25 +8,24 @@ import Comment,{IComment} from "./Comment";
 import CommentCreate from "./CommentCreate";
 import User from '../Services/user-service';
 
-
-
+export interface IRecipe{
+  _id?: string;
+  name: string;
+  author: string;
+  authorImg:string;
+  category: string;
+  ingredients: string[];
+  instructions: string;
+  description: string;
+  createdAt:number;
+  image: string;
+  likes: number;
+  likedBy: string[];
+}
+const token=User.getUser().accessToken!
 export default function Recipe() {
 
-  interface IRecipe{
-    _id: string;
-    name: string;
-    author: string;
-    authorImg:string;
-    category: string;
-    ingredients: string[];
-    instructions: string;
-    description: string;
-    createdAt:Date
-    image: string;
-    likes: number;
-    likedBy: string[];
-  }
-  const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjZhMTgzNWQyOGNjMzc5N2I0NzMzODEiLCJyYW5kb20iOiI1NDYxNTUiLCJpYXQiOjE3MTgyMjkwNDV9.r-Q01kk1HG1c8SQ6NMJOT9SQ8PkI2Mrx3KjVGpR-8ZQ"
+  
   const googleFontUrl="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap";
   //const {id}=useParams();
   const [recipe,setRecipe] = useState<IRecipe>(null!);
@@ -122,24 +121,24 @@ export default function Recipe() {
 
 
   return (
-    <div className="page-container" style={{display: 'flex'}}>
-    <div className="sidebar" style={{flex:"1", backgroundColor:"#579fba"}}></div>
-    <div style={{ flex:"1",display: 'flex',flexDirection: 'column', justifyContent: 'center',fontFamily: "sans-serif",backgroundColor:"#FFFDD0"}}>
-        <img src={bread} style={{width: '500px',margin:"10px"}}/>
-        <h2 style={{fontWeight: "bolder",marginLeft:"10px"}}>{recipe.name}</h2>        
-        <p style={{marginLeft:"10px"}}>{recipe.description}</p>
-        <div style={{flexDirection:'row', display:'flex', alignItems: 'center', justifyContent: 'space-between', marginLeft:"10px", marginTop:"50px"}}>
-  <div style={{display: 'flex', alignItems: 'center'}}>
-    <h3 style={{marginRight:"20px"}}>{recipe.author}</h3>
-    <img src={recipe.authorImg} style={{borderRadius: '50%', marginRight: '20px'}}/>
+      <div className="page-container" style={{display: 'flex'}}>
+      <div className="sidebar" style={{flex:"1", backgroundColor:"#579fba"}}></div>
+      <div style={{ flex:"1",display: 'flex',flexDirection: 'column', justifyContent: 'center',fontFamily: "sans-serif",backgroundColor:"#FFFDD0"}}>
+          <img src={bread} style={{width: '500px',margin:"10px"}}/>
+          <h2 style={{fontWeight: "bolder",marginLeft:"10px"}}>{recipe.name}</h2>        
+          <p style={{marginLeft:"10px"}}>{recipe.description}</p>
+          <div style={{flexDirection:'row', display:'flex', alignItems: 'center', justifyContent: 'space-between', marginLeft:"10px", marginTop:"50px"}}>
+    <div style={{display: 'flex', alignItems: 'center'}}>
+      <h3 style={{marginRight:"20px"}}>{recipe.author}</h3>
+      <img src={recipe.authorImg} style={{borderRadius: '50%', marginRight: '20px'}}/>
+    </div>
+    <div style={{display: 'flex', alignItems: 'center'}}>
+      <button type="button" className="btn" onClick={likeInc} style={{marginRight: '10px'}}>
+        <FontAwesomeIcon icon={faThumbsUp} className="fa-xl tinted-icon" style={{color: like ? 'green' : 'inherit'}} />
+      </button>
+      <span style={{padding: "25px 20px"}}>{recipe.likes}</span>
+    </div>
   </div>
-  <div style={{display: 'flex', alignItems: 'center'}}>
-    <button type="button" className="btn" onClick={likeInc} style={{marginRight: '10px'}}>
-      <FontAwesomeIcon icon={faThumbsUp} className="fa-xl tinted-icon" style={{color: like ? 'green' : 'inherit'}} />
-    </button>
-    <span style={{padding: "25px 20px"}}>{recipe.likes}</span>
-  </div>
-</div>
 
         <div style={{marginLeft:"10px",marginTop:"25px"}}>
         <h2>Ingredients</h2>
@@ -149,8 +148,8 @@ export default function Recipe() {
         <h2 style={{marginTop:"25px"}}>Instructions</h2>
         <p>{recipe.instructions}</p>
         </div>
-        <h2>Comments</h2>
-        <CommentCreate author={User.getUser()!} recipeId="6669866c8369a34d2f140a13" token={User.getToken()!} handle={()=>{renderNeeded?setRenderNeeded(false):setRenderNeeded(true)}}/>
+        <h2 style={{marginTop:"100px" ,display:"flex",justifyContent: 'center'}}>Comments</h2>
+        <CommentCreate author={User.getUser().username!} recipeId="6669866c8369a34d2f140a13" token={token} handle={()=>{renderNeeded?setRenderNeeded(false):setRenderNeeded(true)}}/>
         <div>
           {Comments.map((comment, index) => (
             <Comment

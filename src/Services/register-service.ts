@@ -1,14 +1,15 @@
 import apiClient from '../Services/api-client';
+import User from './user-service'
 
 
 export interface IUser {
-    email: string;
+    email?: string;
     imgUrl: string;
     username: string;
     password: string;
     accessToken?:string;
   }
-  const token=process.env.REACT_APP_ACCESS_TOKEN!
+  const token=User.getUser().accessToken!
   
 export const registrUser = (user: IUser) => {
     return new Promise<IUser>((resolve, reject) => {

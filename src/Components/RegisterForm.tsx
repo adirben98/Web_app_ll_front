@@ -7,12 +7,13 @@ import { useForm } from "react-hook-form"
 import apiClient from '../Services/api-client';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { IUser, registrUser } from '../Services/register-service';
+import User from '../Services/user-service'
 
 export default  function RegisterForm () {
 
 const {register, handleSubmit, formState:{errors}, setError, watch} = useForm<IUser>();
 
-const token=process.env.REACT_APP_ACCESS_TOKEN!;
+const token=User.getUser().accessToken!
 
 
   async function Register() {
@@ -29,7 +30,13 @@ const token=process.env.REACT_APP_ACCESS_TOKEN!;
       password: watch("password")
 
     }
-    registrUser(user).then((data) =>{console.log(data);
+    registrUser(user).then((data) =>{
+      localStorage.setItem("username", data.username);
+        localStorage.setItem("userImg", data.imgUrl);
+
+        localStorage.setItem("token", data.accessToken!);
+      
+      console.log(data);
       }).catch((error) => {
         console.log(error);
     

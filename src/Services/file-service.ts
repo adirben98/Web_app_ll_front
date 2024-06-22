@@ -1,8 +1,9 @@
 import apiClient from "./api-client";
+import User from "./user-service";
 interface IPhoto{
     url:string
 }
-const token=process.env.REACT_APP_ACCESS_TOKEN!
+const token=User.getUser().accessToken!
 
 const uploadPhoto = async (photo:File) =>{
     const formData = new FormData();

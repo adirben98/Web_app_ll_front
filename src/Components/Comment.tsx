@@ -17,7 +17,7 @@ const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, edited, on
   const [newContent, setNewContent] = useState<string>(content);
   async function deleteComment() {
     try{
-        const res=await apiClient(User.getToken()!).delete(`/comment/${_id}`)
+        const res=await apiClient(User.getUser().accessToken!).delete(`/comment/${_id}`)
         console.log(res);
         onUpdateHandler()
     }
@@ -36,7 +36,7 @@ const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, edited, on
         createdAt:createdAt,
         edited:true
     }
-    const res=await apiClient(User.getToken()!).put(`/comment`,newComment)
+    const res=await apiClient(User.getUser().accessToken!).put(`/comment`,newComment)
     console.log(res);
     setIsEditing(false);
     onUpdateHandler()
@@ -96,7 +96,7 @@ const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, edited, on
 
           <p style={{ margin: '10px 0' }}>{content}</p>
           {edited && <span style={{ fontSize: '0.8em', color: '#999' }}>Edited</span>}
-          {User.getUser() === author && (
+          {User.getUser().username === author && (
             <div>
                  <button
               style={{
