@@ -32,6 +32,7 @@ const token=User.getUser().accessToken!
     }
     registrUser(user).then((data) =>{
       localStorage.setItem("username", data.username);
+      localStorage.setItem("email", data.email!);
         localStorage.setItem("userImg", data.imgUrl);
 
         localStorage.setItem("token", data.accessToken!);

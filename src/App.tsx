@@ -1,6 +1,5 @@
-
-import LoginForm from './Components/LoginForm';
-
+import RecipeRow from './Components/RecipeRow';
+import ProfilePage from './Components/ProfilePage';
 
 
 function App() {
@@ -8,7 +7,7 @@ function App() {
 
   return (
     <>
-    <LoginForm/>
+    <RecipeRow recipeImg='' recipeName='meal' description='prep'/>
     </>
   )
 }

@@ -1,38 +1,40 @@
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import bread from "../assets/bread.jpeg";
+import {  useForm } from "react-hook-form";
 import { IRecipe } from "./Recipe";
 import apiClient from "../Services/api-client";
 import User from "../Services/user-service";
 import uploadPhoto from "../Services/file-service";
+//import {useParams} from "react-router-dom";
 
-export default function AddRecipe() {
-  const [image, setImage] = useState<File>();
+export default function EditRecipe() {
+  const [image, setImage] = useState<string>("");
+  const [newImage, setNewImage] = useState<File>();
   const photoGalleryRef = useRef<HTMLInputElement>(null);
-  const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+  const [options, setOptions] = useState<{ value: string; label: string }[]>(
+    []
+  );
   const [category, setCategory] = useState<string>("");
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredient, setIngredient] = useState<string>("");
+  //const {id}=useParams();
 
   const token = User.getUser().accessToken!;
   const {
+    setValue,
     setError,
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm<IRecipe>();
 
   function handleAddIngredient() {
-
     if (!ingredient.trim()) return;
 
     //setValue("ingredients", []);
     setIngredients([...ingredients, ingredient.trim()]);
-    console.log(ingredients);
-    console.log(ingredient);
+    
   }
 
   function handleRemoveIngredient(index: number) {
@@ -52,41 +54,34 @@ export default function AddRecipe() {
     return true;
   }
 
-  const user = User.getUser();
 
-  async function onSubmit() {
+  async function onSubmit(data: IRecipe) {
     console.log(ingredients);
     if (inputValid()) {
       let imageUrl;
-      if (image) imageUrl = await uploadPhoto(image!);
-      else imageUrl = bread;
+      if (newImage) imageUrl = await uploadPhoto(newImage!);
+      else imageUrl = image!;
 
-      const newRecipe: IRecipe = {
-        name: watch("name"),
-        author: user.username!,
-        authorImg: user.userImg!,
-        category: category,
-        ingredients: ingredients,
-        instructions: watch("instructions"),
-        description: watch("description"),
+      const updatedRecipe: IRecipe = {
+        ...data,
+        _id: "66753fc42107fa80f47e0d62",
         image: imageUrl,
-        createdAt: Date.now(),
-        likes: 0,
-        likedBy: [],
+        ingredients: ingredients,
+        category: category
       };
       try {
-        const res = await apiClient(token).post<IRecipe>("/recipe", newRecipe);
+        const res = await apiClient(token).put<IRecipe>("/recipe", updatedRecipe);
         console.log(res);
       } catch (err) {
         console.log(err);
       }
     }
   }
-  
+
   async function getCategories() {
     try {
       const categories = await apiClient(token).get("/recipe/getCategories");
-      console.log(categories);
+      
       const arr = [];
       for (let i = 0; i < categories.data.length; i++) {
         arr.push({ value: categories.data[i], label: categories.data[i] });
@@ -103,6 +98,7 @@ export default function AddRecipe() {
 
   useEffect(() => {
     getCategories();
+    fetchRecipe();
   }, []);
 
   const selectRef = useRef<HTMLSelectElement>(null);
@@ -111,6 +107,34 @@ export default function AddRecipe() {
     e.target.style.height = "auto";
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
+  async function fetchRecipe(){
+    try{
+        const recipe=(await apiClient(token).get("/recipe/66753fc42107fa80f47e0d62")).data;
+        setValue("name",recipe.name);
+        setValue("author",recipe.author);
+        setValue("authorImg",recipe.authorImg);
+        setValue("instructions",recipe.instructions);
+        setValue("description",recipe.description);
+        setImage(recipe.image);
+        setIngredients(recipe.ingredients);
+        const categories = options.slice();
+        console.log(ingredients);
+
+        const userCategoryIndex = categories.findIndex(cat => cat.value === recipe.category);
+        if (userCategoryIndex !== -1) {
+          const userCategory = categories.splice(userCategoryIndex, 1)[0];
+          categories.unshift(userCategory);
+        }
+        setCategory(recipe.category);
+        setOptions(categories);
+
+        
+
+    }
+    catch(err){
+        console.log(err);
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -125,7 +149,7 @@ export default function AddRecipe() {
           <h1 style={{ marginBottom: "50px" }}>New Recipe</h1>
           <div style={{ marginBottom: "20px" }}>
             <img
-              src={image ? URL.createObjectURL(image) : bread}
+              src={newImage ? URL.createObjectURL(newImage) : image}
               style={{ width: "100%", margin: "10px" }}
             />
           </div>
@@ -139,7 +163,7 @@ export default function AddRecipe() {
               type="file"
               onChange={(event) => {
                 if (event.target.files) {
-                  setImage(event.target.files[0]);
+                    setNewImage(event.target.files[0]);
                 }
               }}
             />
@@ -166,7 +190,6 @@ export default function AddRecipe() {
               }}
               ref={selectRef}
             >
-              <option value="">Select Category</option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -184,7 +207,7 @@ export default function AddRecipe() {
               id="ingredients"
               placeholder="ingredients"
               {...register("ingredients", {
-                required: "Ingredients are required",
+                
               })}
               onChange={(e) => setIngredient(e.target.value)}
             />
@@ -251,7 +274,7 @@ export default function AddRecipe() {
             className="btn btn-primary"
             style={{ marginBottom: "50px" }}
           >
-            Submit
+            Edit
           </button>
         </div>
       </div>
