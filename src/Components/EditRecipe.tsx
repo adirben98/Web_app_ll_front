@@ -4,9 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import {  useForm } from "react-hook-form";
 import { IRecipe } from "./Recipe";
 import apiClient from "../Services/api-client";
-import User from "../Services/user-service";
 import uploadPhoto from "../Services/file-service";
-//import {useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 
 export default function EditRecipe() {
   const [image, setImage] = useState<string>("");
@@ -18,9 +17,8 @@ export default function EditRecipe() {
   const [category, setCategory] = useState<string>("");
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredient, setIngredient] = useState<string>("");
-  //const {id}=useParams();
+  const {id}=useParams();
 
-  const token = User.getUser().accessToken!;
   const {
     setValue,
     setError,
@@ -32,7 +30,6 @@ export default function EditRecipe() {
   function handleAddIngredient() {
     if (!ingredient.trim()) return;
 
-    //setValue("ingredients", []);
     setIngredients([...ingredients, ingredient.trim()]);
     
   }
@@ -64,13 +61,13 @@ export default function EditRecipe() {
 
       const updatedRecipe: IRecipe = {
         ...data,
-        _id: "66753fc42107fa80f47e0d62",
+        _id: id,
         image: imageUrl,
         ingredients: ingredients,
         category: category
       };
       try {
-        const res = await apiClient(token).put<IRecipe>("/recipe", updatedRecipe);
+        const res = await apiClient.put<IRecipe>("/recipe", updatedRecipe);
         console.log(res);
       } catch (err) {
         console.log(err);
@@ -80,7 +77,7 @@ export default function EditRecipe() {
 
   async function getCategories() {
     try {
-      const categories = await apiClient(token).get("/recipe/getCategories");
+      const categories = await apiClient.get("/recipe/getCategories");
       
       const arr = [];
       for (let i = 0; i < categories.data.length; i++) {
@@ -109,7 +106,7 @@ export default function EditRecipe() {
   };
   async function fetchRecipe(){
     try{
-        const recipe=(await apiClient(token).get("/recipe/66753fc42107fa80f47e0d62")).data;
+        const recipe=(await apiClient.get("/recipe/"+id)).data;
         setValue("name",recipe.name);
         setValue("author",recipe.author);
         setValue("authorImg",recipe.authorImg);

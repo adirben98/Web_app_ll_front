@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import apiClient from "../Services/api-client";
-import User from "../Services/user-service";
+import {setLocalStorage} from "../Services/register-service";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 export default function LoginForm() {
@@ -8,26 +8,22 @@ export default function LoginForm() {
     email: string;
     username: string;
     password: string;
-    userImg: string;
+    imgUrl: string;
     accessToken?: string;
     refreshToken?: string;
   }
-  const token = User.getUser().accessToken!;
 
   function login() {
     console.log("login");
 
-    apiClient(token)
-      .post<IUser>("auth/login", {
+    apiClient
+      .post<IUser>("/auth/login", {
         email: watch("email"),
         password: watch("password"),
       })
       .then((response) => {
+        setLocalStorage(response.data)
         console.log(response);
-        localStorage.setItem("username", response.data.username);
-        localStorage.setItem("userImg", response.data.userImg);
-
-        localStorage.setItem("token", response.data.accessToken!);
       })
       .catch(() => {
         setError("password", { message: "Invalid Email or Password" });
@@ -41,16 +37,16 @@ export default function LoginForm() {
     setError,
   } = useForm<IUser>();
 
-  async function onSuccess(credentials:CredentialResponse){
-    try{
-      const res=await apiClient(token).post("auth/googleLogin", {
-        credentials:credentials.credential
-      })
+  async function onSuccess(credentials: CredentialResponse) {
+    try {
+      const res = await apiClient.post("auth/googleLogin", {
+        credentials: credentials.credential,
+      });
+      setLocalStorage(res.data);
       console.log(res);
-      }catch(error){
-        console.log(error);
-      }
-
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -89,11 +85,17 @@ export default function LoginForm() {
             <label htmlFor="password">Password</label>
             {errors.password && <span>{errors.password.message}</span>}
           </div>
-          <div style={{display:"flex",justifyContent: 'space-between',alignItems: 'center',marginTop:"25px"}}>
-          <button className="btn btn-primary ">Login</button>
-          <GoogleLogin onSuccess={onSuccess} />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "25px",
+            }}
+          >
+            <button className="btn btn-primary ">Login</button>
+            <GoogleLogin onSuccess={onSuccess} />
           </div>
-      
         </div>
       </div>
     </form>

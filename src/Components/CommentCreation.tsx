@@ -4,7 +4,6 @@ import apiClient from "../Services/api-client";
 interface AddCommentProps {
   author: string;
   recipeId: string;
-  token: string;
   handle:()=>void;
 }
 
@@ -12,19 +11,20 @@ interface FormData {
   content: string;
 }
 
-export default function CommentCreate({ author, recipeId, token, handle }: AddCommentProps) {
+export default function CommentCreate({ author, recipeId, handle }: AddCommentProps) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
     try {
+
       const newComment = {
         author,
         recipeId,
         content: data.content,
       };
-      const res = await apiClient(token).post("/comment", newComment);
+      const res = await apiClient.post("/comment", newComment);
       console.log(res);
-      reset(); // Reset the form after successful submission
+      reset()
       handle()
     } catch (error) {
       console.log(error);

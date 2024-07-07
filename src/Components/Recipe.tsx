@@ -1,11 +1,11 @@
 import  { useEffect, useState } from "react";
-//import {useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import apiClient from "../Services/api-client";
 import bread from "../assets/bread.jpeg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons'
 import Comment,{IComment} from "./Comment";
-import CommentCreate from "./CommentCreate";
+import CommentCreate from "./CommentCreation";
 import User from '../Services/user-service';
 
 export interface IRecipe{
@@ -22,12 +22,11 @@ export interface IRecipe{
   likes: number;
   likedBy: string[];
 }
-const token=User.getUser().accessToken!
 export default function Recipe() {
 
   
   const googleFontUrl="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap";
-  //const {id}=useParams();
+  const {id}=useParams();
   const [recipe,setRecipe] = useState<IRecipe>(null!);
   const [loading,setLoading] = useState<boolean>(true);
   const[like,setLike]=useState<boolean>(false)
@@ -42,7 +41,7 @@ export default function Recipe() {
 
     async function getRecipe(){
       try{
-        const recipe=await apiClient(token).get("/recipe/6669866c8369a34d2f140a13");
+        const recipe=await apiClient.get("/recipe/"+id);
         setRecipe(recipe.data);
         console.log(recipe);
         setLoading(false);
@@ -53,7 +52,7 @@ export default function Recipe() {
       }
     async function isLiked(){
       try{
-        const res=await apiClient(token).get("/recipe/isLiked/6669866c8369a34d2f140a13")
+        const res=await apiClient.get("/recipe/isLiked/"+id)
         console.log(res)
         if (res.data){
         setLike(true)
@@ -67,7 +66,7 @@ export default function Recipe() {
     }
     async function getComments(){
       try{
-        const res=await apiClient(token).get("/comment/6669866c8369a34d2f140a13")
+        const res=await apiClient.get("/comment/"+id)
         console.log(res)
         setComments(res.data)
       }
@@ -86,7 +85,7 @@ export default function Recipe() {
     console.log("Like")
     try{
     if(!like){
-      apiClient(token).post("/recipe/like/6669866c8369a34d2f140a13",{
+      apiClient.post("/recipe/like/"+id,{
       }).then((response)=>{
         console.log(response);
         recipe.likes+=1
@@ -99,7 +98,7 @@ export default function Recipe() {
     }
     else
     {
-      const res=await apiClient(token).post("/recipe/unlike/6669866c8369a34d2f140a13")
+      const res=await apiClient.post("/recipe/unlike/"+id)
       recipe.likes-=1
 
       setLike(false)
@@ -149,7 +148,7 @@ export default function Recipe() {
         <p>{recipe.instructions}</p>
         </div>
         <h2 style={{marginTop:"100px" ,display:"flex",justifyContent: 'center'}}>Comments</h2>
-        <CommentCreate author={User.getUser().username!} recipeId="6669866c8369a34d2f140a13" token={token} handle={()=>{renderNeeded?setRenderNeeded(false):setRenderNeeded(true)}}/>
+        <CommentCreate author={User.getUser().username!} recipeId={`${id}`}  handle={()=>{renderNeeded?setRenderNeeded(false):setRenderNeeded(true)}}/>
         <div>
           {Comments.map((comment, index) => (
             <Comment

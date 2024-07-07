@@ -12,12 +12,12 @@ export interface IComment {
   onUpdateHandler: () => void;
 }
 
-const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, edited, onUpdateHandler }) => {
+const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, recipeId,edited, onUpdateHandler }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [newContent, setNewContent] = useState<string>(content);
   async function deleteComment() {
     try{
-        const res=await apiClient(User.getUser().accessToken!).delete(`/comment/${_id}`)
+        const res=await apiClient.delete(`/comment/${_id}`)
         console.log(res);
         onUpdateHandler()
     }
@@ -27,16 +27,17 @@ const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, edited, on
   }
 
   async function handleEdit() {
+
     try{
     const newComment={
         _id:_id,
         author:author,
         content:newContent,
-        recipeId:"6669866c8369a34d2f140a13",
+        recipeId:recipeId,
         createdAt:createdAt,
         edited:true
     }
-    const res=await apiClient(User.getUser().accessToken!).put(`/comment`,newComment)
+    const res=await apiClient.put(`/comment`,newComment)
     console.log(res);
     setIsEditing(false);
     onUpdateHandler()

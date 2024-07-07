@@ -16,7 +16,6 @@ export default function AddRecipe() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredient, setIngredient] = useState<string>("");
 
-  const token = User.getUser().accessToken!;
   const {
     setError,
     register,
@@ -29,7 +28,6 @@ export default function AddRecipe() {
 
     if (!ingredient.trim()) return;
 
-    //setValue("ingredients", []);
     setIngredients([...ingredients, ingredient.trim()]);
     console.log(ingredients);
     console.log(ingredient);
@@ -56,6 +54,7 @@ export default function AddRecipe() {
 
   async function onSubmit() {
     console.log(ingredients);
+
     if (inputValid()) {
       let imageUrl;
       if (image) imageUrl = await uploadPhoto(image!);
@@ -75,7 +74,7 @@ export default function AddRecipe() {
         likedBy: [],
       };
       try {
-        const res = await apiClient(token).post<IRecipe>("/recipe", newRecipe);
+        const res = await apiClient.post<IRecipe>("/recipe", newRecipe);
         console.log(res);
       } catch (err) {
         console.log(err);
@@ -85,7 +84,8 @@ export default function AddRecipe() {
   
   async function getCategories() {
     try {
-      const categories = await apiClient(token).get("/recipe/getCategories");
+
+      const categories = await apiClient.get("/recipe/getCategories");
       console.log(categories);
       const arr = [];
       for (let i = 0; i < categories.data.length; i++) {
