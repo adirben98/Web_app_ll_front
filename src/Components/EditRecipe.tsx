@@ -6,6 +6,8 @@ import { IRecipe } from "./Recipe";
 import apiClient from "../Services/api-client";
 import uploadPhoto from "../Services/file-service";
 import {useParams} from "react-router-dom";
+//fix the paranthesis
+//fix the paranthesis
 
 export default function EditRecipe() {
   const [image, setImage] = useState<string>("");
@@ -75,38 +77,25 @@ export default function EditRecipe() {
     }
   }
 
-  async function getCategories() {
-    try {
-      const categories = await apiClient.get("/recipe/getCategories");
-      
-      const arr = [];
-      for (let i = 0; i < categories.data.length; i++) {
-        arr.push({ value: categories.data[i], label: categories.data[i] });
-      }
-      setOptions(arr);
-    } catch (err) {
-      console.log(err);
-    }
-  }
+ 
 
   function handleClick() {
     photoGalleryRef.current?.click();
   }
 
   useEffect(() => {
-    getCategories();
-    fetchRecipe();
-  }, []);
-
-  const selectRef = useRef<HTMLSelectElement>(null);
-
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.target.style.height = "auto";
-    e.target.style.height = `${e.target.scrollHeight}px`;
-  };
-  async function fetchRecipe(){
-    try{
-        const recipe=(await apiClient.get("/recipe/"+id)).data;
+    async function getData(){
+      try {
+        const controller = new AbortController();
+        const Categories = await apiClient.get("/recipe/getCategories",{signal:controller.signal});
+        
+        const arr = [];
+        for (let i = 0; i < Categories.data.length; i++) {
+          arr.push({ value: Categories.data[i], label: Categories.data[i] });
+        }
+        setOptions(arr);
+    
+        const recipe=(await apiClient.get("/recipe/"+id,{signal:controller.signal})).data;
         setValue("name",recipe.name);
         setValue("author",recipe.author);
         setValue("authorImg",recipe.authorImg);
@@ -116,7 +105,7 @@ export default function EditRecipe() {
         setIngredients(recipe.ingredients);
         const categories = options.slice();
         console.log(ingredients);
-
+    
         const userCategoryIndex = categories.findIndex(cat => cat.value === recipe.category);
         if (userCategoryIndex !== -1) {
           const userCategory = categories.splice(userCategoryIndex, 1)[0];
@@ -124,14 +113,22 @@ export default function EditRecipe() {
         }
         setCategory(recipe.category);
         setOptions(categories);
-
-        
-
+      }
+      catch(err){
+          console.log(err);
+      }
     }
-    catch(err){
-        console.log(err);
-    }
-  }
+    getData();    
+  }, []);
+
+  const selectRef = useRef<HTMLSelectElement>(null);
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.target.style.height = "auto";
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  };
+
+ 
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

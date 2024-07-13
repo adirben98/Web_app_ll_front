@@ -39,44 +39,37 @@ export default function Recipe() {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
 
-    async function getRecipe(){
+    const controller=new AbortController();
+    
+ 
+    async function getData(){
       try{
-        const recipe=await apiClient.get("/recipe/"+id);
-        setRecipe(recipe.data);
-        console.log(recipe);
-        setLoading(false);
-        }
-        catch(error){
-          //console.log(error);
-        }
-      }
-    async function isLiked(){
-      try{
-        const res=await apiClient.get("/recipe/isLiked/"+id)
+        const res=await apiClient.get("/comment/"+id,{signal:controller.signal})
         console.log(res)
-        if (res.data){
+        setComments(res.data)
+
+        const res1=await apiClient.get("/recipe/isLiked/"+id,{signal:controller.signal})
+        console.log(res1)
+        if (res1.data){
         setLike(true)
         }
         else{
           setLike(false)
         }
-      }catch(error){
+
+        const recipe=await apiClient.get("/recipe/"+id,{signal:controller.signal});
+        setRecipe(recipe.data);
+
+        console.log(recipe);
+        setLoading(false);
+
+      }
+      catch(error){
         console.log(error)
       }
     }
-    async function getComments(){
-      try{
-        const res=await apiClient.get("/comment/"+id)
-        console.log(res)
-        setComments(res.data)
-      }
-      catch(error){
-        console.log(error);
-      }
-    }
-    getComments();
-    isLiked();
-    getRecipe();
+    getData()
+    return () => {controller.abort()}
     
   }
   ,[renderNeeded]);
@@ -132,10 +125,11 @@ export default function Recipe() {
       <img src={recipe.authorImg} style={{borderRadius: '50%', marginRight: '20px'}}/>
     </div>
     <div style={{display: 'flex', alignItems: 'center'}}>
-      <button type="button" className="btn" onClick={likeInc} style={{marginRight: '10px'}}>
+      {User.getUser().username!==recipe.author&&  <button type="button" className="btn" onClick={likeInc} style={{marginRight: '10px'}}>
         <FontAwesomeIcon icon={faThumbsUp} className="fa-xl tinted-icon" style={{color: like ? 'green' : 'inherit'}} />
-      </button>
-      <span style={{padding: "25px 20px"}}>{recipe.likes}</span>
+      </button>}
+     
+      <span style={{padding: "25px 20px"}}>Likes:{recipe.likes}</span>
     </div>
   </div>
 

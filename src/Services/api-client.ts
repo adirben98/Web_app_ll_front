@@ -6,12 +6,9 @@ const apiClient = axios.create({
 
 const authExcludedRoutes = ['/auth/login', '/auth/register','/auth/isEmailTaken','/auth/isUsernameTaken','/auth/googleLogin'];
 const isAuthExcludedRoute = (url:string) => {
-  // Check if the URL matches any exact route
   if (authExcludedRoutes.includes(url) || url.startsWith('file')) {
     return true;
   }
-
-  
 };
 
 apiClient.interceptors.request.use(async (config): Promise<InternalAxiosRequestConfig<unknown>> => {
