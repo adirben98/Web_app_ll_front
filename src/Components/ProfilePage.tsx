@@ -201,51 +201,56 @@ export default function ProfilePage() {
       </div>
 
       <div
-        className="tab-content-container"
-        style={{ width: "100%", maxWidth: "1000px", marginTop: "20px" }}
-      >
-        <div className="tab-content mt-4">
-          {activeTab === "myRecipes" && (
-            <div className="tab-pane fade show active">
-              <p>Here is the list of My Recipes.</p>
-              {myRecipes.map((recipe) => (
-                <RecipeRow
-                  key={recipe.name}
-                  id={recipe._id!}
-                  recipeImg={recipe.image}
-                  recipeName={recipe.name}
-                  description={recipe.description}
-                />
-              ))}
-            </div>
-          )}
-          {activeTab === "foodNow" && (
-            <div className="tab-pane fade show active">
-              <p>Here is the list of "Food-Now" Favorites.</p>
-              {foodNowFavorites.map((recipe) => (
-                <RecipeRow
-                  id={recipe._id!}
-                  key={recipe.name}
-                  recipeImg={recipe.image}
-                  recipeName={recipe.name}
-                  description={recipe.description}
-                />
-              ))}
-            </div>
-          )}
-
-          {activeTab === "Edit" && (
-            <div className="tab-pane fade show active">
-              <p>Edit profile</p>
-              <ChangePassword
-                afterEdit={() => {
-                  setActiveTab("");
-                  renderNeeded ? setRenderNeeded(false) : setRenderNeeded(true);
-                }}
+  className="tab-content-container"
+  style={{ width: "100%", maxWidth: "1000px", marginTop: "20px" }}
+>
+  <div className="tab-content mt-4">
+    {activeTab === "myRecipes" && (
+      <div className="tab-pane fade show active">
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+          {myRecipes.map((recipe) => (
+            <div key={recipe._id!} style={{ flex: "1 1 calc(33.333% - 10px)" }}>
+              <RecipeRow
+                id={recipe._id!}
+                recipeImg={recipe.image}
+                recipeName={recipe.name}
+                description={recipe.description}
               />
             </div>
-          )}
+          ))}
         </div>
+      </div>
+    )}
+
+    {activeTab === "foodNow" && (
+      <div className="tab-pane fade show active">
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+          {foodNowFavorites.map((recipe) => (
+            <div key={recipe._id!} style={{ flex: "1 1 calc(33.333% - 10px)" }}>
+              <RecipeRow
+                id={recipe._id!}
+                recipeImg={recipe.image}
+                recipeName={recipe.name}
+                description={recipe.description}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {activeTab === "Edit" && (
+      <div className="tab-pane fade show active">
+        <ChangePassword
+          afterEdit={() => {
+            setActiveTab("");
+            renderNeeded ? setRenderNeeded(false) : setRenderNeeded(true);
+          }}
+        />
+      </div>
+    )}
+  </div>
+
       </div>
     </div>
   );
