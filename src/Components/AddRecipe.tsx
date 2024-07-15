@@ -82,10 +82,10 @@ export default function AddRecipe() {
     }
   }
   
-  async function getCategories() {
+  async function getCategories(signal: AbortSignal) {
     try {
 
-      const categories = await apiClient.get("/recipe/getCategories");
+      const categories = await apiClient.get("/recipe/getCategories",{signal:signal});
       console.log(categories);
       const arr = [];
       for (let i = 0; i < categories.data.length; i++) {
@@ -102,7 +102,8 @@ export default function AddRecipe() {
   }
 
   useEffect(() => {
-    getCategories();
+    const controller = new AbortController();
+    getCategories(controller.signal)
   }, []);
 
   const selectRef = useRef<HTMLSelectElement>(null);
