@@ -104,6 +104,9 @@ export default function AddRecipe() {
   useEffect(() => {
     const controller = new AbortController();
     getCategories(controller.signal)
+    return () => {
+      controller.abort();
+    }
   }, []);
 
   const selectRef = useRef<HTMLSelectElement>(null);

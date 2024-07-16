@@ -4,7 +4,7 @@ const apiClient = axios.create({
   baseURL: 'http://localhost:3000',
 });
 
-const authExcludedRoutes = ['/auth/login', '/auth/register','/auth/isEmailTaken','/auth/isUsernameTaken','/auth/googleLogin'];
+const authExcludedRoutes = ['/auth/login', '/auth/register','/auth/isEmailTaken','/auth/isUsernameTaken','auth/googleLogin'];
 const isAuthExcludedRoute = (url:string) => {
   if (authExcludedRoutes.includes(url) || url.startsWith('file')) {
     return true;
