@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
-import User from "../Services/user-service";
-import apiClient from "../Services/api-client";
-
+import authService from "../Services/auth-service";
+import userService from "../Services/user-service";
 interface IPassword {
   oldPassword?: string;
   newPassword?: string;
@@ -14,31 +13,30 @@ export default function EditProfile({ afterEdit }: IPassword) {
     handleSubmit,
     formState: { errors },
     watch,
-    setError
+    setError,
   } = useForm<IPassword>();
 
   async function onSubmit(data: IPassword) {
-    try {
       const oldPassword = watch("oldPassword");
       const newPassword = watch("newPassword");
-      const username = User.getUser().username;
+      const username = userService.getConnectedUser().username;
 
-      const res = await apiClient.put(
-        "auth/changePassword",
-        {
-          username,
-          oldPassword: oldPassword,
-          newPassword: newPassword,
-        }
-      );
-      {
-        res.status === 200 && afterEdit() 
-      }
-      console.log(res);
-    } catch (err) {
-      setError("oldPassword", { message: "Password is incorrect" })
-      console.log(err);
-    }
+      authService
+        .changePassword({
+          username: username!,
+          oldPassword: oldPassword!,
+          newPassword: newPassword!,
+        })
+        .then((res) => {
+          {
+            res && afterEdit();
+          }
+        })
+        .catch((err) => {
+          setError("oldPassword", { message: "Password is incorrect" });
+          console.log(err);
+        });
+   
 
     console.log(data);
   }

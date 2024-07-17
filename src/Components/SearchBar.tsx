@@ -1,7 +1,6 @@
 import { useState, ChangeEvent, FormEvent, useRef } from "react";
-import apiClient from "../Services/api-client";
 import { useNavigate } from "react-router-dom";
-import { IRecipe } from "./Recipe";
+import recipeService from "../Services/recipe-service";
 
 interface SearchResult {
   id: string;
@@ -15,22 +14,25 @@ export default function SearchBar() {
   const ref=useRef<HTMLInputElement>(null);
 
   async function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    
     const query = event.target.value;
-    try {
+    const { results } = recipeService.searchRecipes(query!);
+
       if (!query) {
         setSearchResults([]);
         setShowDropdown(false);
         return;
       }
-      const results = await apiClient.get<IRecipe[]>(`/recipe/search`, {
-        params: { q: query },
-      });
-      const recipes=results.data.map((recipe) => { return {id:recipe._id!,name:recipe.name}; });
-      setSearchResults(recipes);
-      setShowDropdown(true);
-    } catch (error) {
-      console.log(error);
-    }
+      results.then((results) => {
+        const recipes=results.data.map((recipe) => { return {id:recipe._id!,name:recipe.name}; });
+        setSearchResults(recipes);
+        setShowDropdown(true);
+      })
+      results.catch((error) => {
+        console.log(error);
+      })
+      
+    
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

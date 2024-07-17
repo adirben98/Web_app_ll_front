@@ -1,48 +1,73 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import apiClient from "../Services/api-client";
+import  { CanceledError } from "../Services/api-client";
 import RecipeRow, { recipeRow } from "./RecipeRow";
-import { IRecipe } from "./Recipe";
+import recipeService from "../Services/recipe-service";
 
 export default function SearchPage() {
   const location = useLocation();
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchResults, setSearchResults] = useState<recipeRow[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const params = new URLSearchParams(location.search);
   const queryParam = params.get("q");
 
   useEffect(() => {
-    const controller = new AbortController();
-
+    const { Categories, cancelCategories } = recipeService.getCategories();
+    const { results, cancelSearch } = recipeService.searchRecipes(queryParam!);
     async function getData() {
-      try {
-        const Categories = await apiClient.get<string[]>(
-          "/recipe/getCategories",
-          { signal: controller.signal }
-        );
-        setCategories(Categories.data);
-        const res = await apiClient.get<IRecipe[]>(`/recipe/search`, {
-          signal: controller.signal,
-          params: { q: queryParam },
+        Categories.then((Categories) => setCategories(Categories.data));
+        Categories.catch((error) => {
+          if (error instanceof CanceledError) return;
+          console.log(error);
         });
-        const recipes = res.data.map((recipe) => {
-          return {
-            id: recipe._id!,
-            recipeName: recipe.name,
-            recipeImg: recipe.image,
-            description: recipe.description,
-          };
-        });
-        setSearchResults(recipes);
-      } catch (error) {
-        console.log(error);
-      }
+        results.then((results) => {
+          const recipes = results.data.map((recipe) => {
+            return {
+              id: recipe._id!,
+              recipeName: recipe.name,
+              recipeImg: recipe.image,
+              description: recipe.description,
+            };
+          });
+          setSearchResults(recipes);
+
+        })
+        results.catch((error) => {
+          if (error instanceof CanceledError) return;
+          console.log(error);
+
+        })
+    
+        setLoading(false);
+      
     }
     getData();
     return () => {
-      controller.abort();
+      cancelCategories();
+      cancelSearch()
     };
-  }, []);
+  }, [queryParam]);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        ></div>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
@@ -70,7 +95,7 @@ export default function SearchPage() {
           <ul className="dropdown-menu">
             {categories.map((category) => (
               <li key={category}>
-                <Link className="dropdown-item" to={'/recipe'}>
+                <Link className="dropdown-item" to={"/recipe"}>
                   {category}
                 </Link>
               </li>

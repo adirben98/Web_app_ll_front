@@ -3,10 +3,9 @@ import avatar from "../assets/avatar.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import uploadPhoto from "../Services/file-service";
-import { useForm } from "react-hook-form";
-import apiClient from "../Services/api-client";
+import {  useForm } from "react-hook-form";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { IUser, registrUser ,setLocalStorage} from "../Services/register-service";
+import registerService, { IUser} from "../Services/auth-service";
 
 export default function RegisterForm() {
   const {
@@ -16,26 +15,29 @@ export default function RegisterForm() {
     setError,
     watch,
   } = useForm<IUser>();
+  const [error, seterror] = React.useState<string>("");
 
 
   async function Register() {
 
     let url = "";
-    if (image) url = await uploadPhoto(image!);
+    if (image)uploadPhoto(image!).then((res) => (url = res)).catch((error) => {
+      console.log(error);
+      return
+    })
     else url = avatar;
 
     const user: IUser = {
       email: watch("email"),
-      imgUrl: url,
+      image: url,
       username: watch("username"),
       password: watch("password"),
     };
-    registrUser(user)
+
+
+    registerService.registrUser(user)
       .then((data) => {
-        
-        
-
-
+        window.location.href = "/";
         console.log(data);
       })
       .catch((error) => {
@@ -55,39 +57,35 @@ export default function RegisterForm() {
   }
 
   async function checkEmail(email: string) {
-    try {
-      const res=await apiClient.post("/auth/isEmailTaken", {
-        email: email,
-      });
-      if (res.status===200)setError("email", { message: "" });
-
-    } catch (error) {
+     
+    registerService.isEmailTaken(email).then((res) => {
+      if (res)setError("email", { message: "" });
+     }).catch((error) => {
       setError("email", { message: "This Email is Already Taken" });
-    }
-  }
-  async function checkUsername(username: string) {
-    try {
-      const res=await apiClient.post("/auth/isUsernameTaken", {
-        username: username,
-      });
-      if (res.status===200)setError("username", { message: "" });
+      console.log(error);
+  })}
 
-    } catch (error) {
+  async function checkUsername(username: string) {
+      registerService.isUsernameTaken(username).then((res) => {
+        if(res)setError("username", { message: "" });
       setError("username", { message: "This Username is Already Taken" });
-    }
+      }).catch((error) => {
+      setError("username", { message: "This Username is Already Taken" });
+      console.log(error);
+      })
+
+    
   }
   async function onSuccess(response: CredentialResponse) {
-    try {
-      const res = await apiClient.post<IUser>("auth/googleLogin", {
-        credentials: response.credential,
-      });
-      setLocalStorage(res.data);
+    registerService.googleLogin(response).then((res) => {
       console.log(res);
-    } catch (error) {
+      window.location.href = "/";
+    }).catch((error) => {
       console.log(error);
-    }
+    });
   }
   function onError() {
+    seterror("Error login from google");
     console.log();
   }
 
@@ -96,6 +94,7 @@ export default function RegisterForm() {
   const photoGalleryRef = React.useRef<HTMLInputElement>(null);
   return (
     <form onSubmit={handleSubmit(Register)}>
+      {error && <span>{error}</span>}
       <div
         style={{
           display: "flex",

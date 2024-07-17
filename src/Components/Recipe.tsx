@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import apiClient from "../Services/api-client";
+import  { CanceledError } from "../Services/api-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from '@fortawesome/free-solid-svg-icons'
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import Comment, { IComment } from "./Comment";
 import CommentCreate from "./CommentCreation";
-import User from '../Services/user-service';
+import userService from "../Services/user-service";
+import recipeService from "../Services/recipe-service";
+import commentService from "../Services/comment-service";
+
 
 export interface IRecipe {
   _id?: string;
@@ -16,105 +19,208 @@ export interface IRecipe {
   ingredients: string[];
   instructions: string;
   description: string;
-  createdAt: number;
+  createdAt: string;
   image: string;
   likes: number;
   likedBy: string[];
 }
 
 export default function Recipe() {
-  const googleFontUrl = "https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap";
+  const googleFontUrl =
+    "https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap";
   const { id } = useParams();
-  const [recipe, setRecipe] = useState<IRecipe>(null!);
+  const [recipe, setRecipe] = useState<IRecipe>({
+    name: "",
+    author: "",
+    authorImg: "",
+    category: "",
+    ingredients: [],
+    instructions: "",
+    description: "",
+    createdAt: "",
+    image: "",
+    likes: 0,
+    likedBy: [],
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [like, setLike] = useState<boolean>(false);
   const [comments, setComments] = useState<IComment[]>([]);
   const [renderNeeded, setRenderNeeded] = useState<boolean>(false);
 
   useEffect(() => {
-    const link = document.createElement('link');
+    const link = document.createElement("link");
     link.href = googleFontUrl;
-    link.rel = 'stylesheet';
+    link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    const controller = new AbortController();
+    const { recipe, cancelRecipe } = recipeService.getRecipe(id!);
+    const { isLike, cancelLike } = recipeService.isLiked(id!);
+    const { comments, cancelComments } = commentService.getComments(id!);
 
+    function errorHandler(error: unknown) {
+      if (error instanceof CanceledError) return;
+      window.location.href = "/404";
+      console.log(error);
+    }
     async function getData() {
-      try {
-        const res = await apiClient.get(`/comment/${id}`, { signal: controller.signal });
-        setComments(res.data);
+      recipe
+        .then((recipe) => setRecipe(recipe.data))
+        .catch((error) => {
+          errorHandler(error);
+        });
 
-        const res1 = await apiClient.get(`/recipe/isLiked/${id}`, { signal: controller.signal });
-        setLike(res1.data);
+      comments
+        .then((comments) => setComments(comments.data))
+        .catch((error) => {
+          errorHandler(error);
+        });
 
-        const recipe = await apiClient.get(`/recipe/${id}`, { signal: controller.signal });
-        setRecipe(recipe.data);
+      isLike
+        .then((isLike) => setLike(isLike.data))
+        .catch((error) => {
+          errorHandler(error);
+        });
 
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
+      setLoading(false);
     }
 
     getData();
-    return () => { controller.abort() };
+    return () => {
+      cancelRecipe();
+      cancelComments();
+      cancelLike();
+    };
   }, [id, renderNeeded]);
 
   async function likeClick() {
-    try {
       if (!like) {
-        await apiClient.post(`/recipe/like/${id}`);
-        setRecipe(prevRecipe => ({ ...prevRecipe, likes: prevRecipe.likes + 1 }));
-        setLike(true);
+        recipeService
+          .like(id!)
+          .then(() => {
+            setRecipe((prevRecipe) => ({
+              ...prevRecipe,
+              likes: prevRecipe.likes + 1,
+            }));
+            setLike(true);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       } else {
-        await apiClient.post(`/recipe/unlike/${id}`);
-        setRecipe(prevRecipe => ({ ...prevRecipe, likes: prevRecipe.likes - 1 }));
-        setLike(false);
+        recipeService
+          .unlike(id!)
+          .then(() => {
+            setRecipe((prevRecipe) => ({
+              ...prevRecipe,
+              likes: prevRecipe.likes - 1,
+            }));
+            setLike(false);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
-    } catch (error) {
-      console.log(error);
-    }
+    
   }
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}></div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        ></div>
       </div>
     );
   }
 
   return (
-    <div className="page-container" style={{ display: 'flex' }}>
-      <div className="sidebar" style={{ flex: "1", backgroundColor: "#579fba" }}></div>
-      <div style={{ flex: "2", display: 'flex', flexDirection: 'column', alignItems: 'center', fontFamily: "sans-serif", backgroundColor: "#FFFDD0", padding: "20px" }}>
-        <img src={recipe.image} style={{ width: '80%', maxWidth: '500px', margin: "10px auto" }} alt="Recipe" />
-        <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>{recipe.name}</h2>
+    <div className="page-container" style={{ display: "flex" }}>
+      <div
+        className="sidebar"
+        style={{ flex: "1", backgroundColor: "#579fba" }}
+      ></div>
+      <div
+        style={{
+          flex: "2",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          fontFamily: "sans-serif",
+          backgroundColor: "#FFFDD0",
+          padding: "20px",
+        }}
+      >
+        <img
+          src={recipe.image}
+          style={{ width: "80%", maxWidth: "500px", margin: "10px auto" }}
+          alt="Recipe"
+        />
+        <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>
+          {recipe.name}
+        </h2>
         <p style={{ margin: "10px 0" }}>{recipe.description}</p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', margin: "20px 0" }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            margin: "20px 0",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
             <h3 style={{ marginRight: "20px" }}>{recipe.author}</h3>
-            <img src={recipe.authorImg} style={{ borderRadius: '50%', width: '50px', height: '50px' }} alt="Author" />
+            <img
+              src={recipe.authorImg}
+              style={{ borderRadius: "50%", width: "50px", height: "50px" }}
+              alt="Author"
+            />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {User.getUser().username !== recipe.author && (
-              <button type="button" className="btn" onClick={likeClick} style={{ marginRight: '10px' }}>
-                <FontAwesomeIcon icon={faThumbsUp} className="fa-xl tinted-icon" style={{ color: like ? 'green' : 'inherit' }} />
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {userService.getConnectedUser().username !== recipe.author && (
+              <button
+                type="button"
+                className="btn"
+                onClick={likeClick}
+                style={{ marginRight: "10px" }}
+              >
+                <FontAwesomeIcon
+                  icon={faThumbsUp}
+                  className="fa-xl tinted-icon"
+                  style={{ color: like ? "green" : "inherit" }}
+                />
               </button>
             )}
             <span style={{ padding: "25px 20px" }}>Likes: {recipe.likes}</span>
           </div>
         </div>
-        <div style={{ width: '100%' }}>
+        <div style={{ width: "100%" }}>
           <h2>Ingredients</h2>
           <ul>
-            {recipe.ingredients.map((ingredient, index) => <li key={index}>{ingredient}</li>)}
+            {recipe.ingredients.map((ingredient, index) => (
+              <li key={index}>{ingredient}</li>
+            ))}
           </ul>
           <h2 style={{ marginTop: "25px" }}>Instructions</h2>
           <p>{recipe.instructions}</p>
+          <h2 style={{ marginTop: "25px" }}>Created At</h2>
+          <p>{recipe.createdAt}</p>
         </div>
-        <h2 style={{ marginTop: "50px", textAlign: 'center' }}>Comments</h2>
-        <CommentCreate author={User.getUser().username!} recipeId={`${id}`} handle={() => setRenderNeeded(!renderNeeded)} />
+        <h2 style={{ marginTop: "50px", textAlign: "center" }}>Comments</h2>
+        <CommentCreate
+          author={userService.getConnectedUser().username!}
+          recipeId={`${id}`}
+          handle={() => setRenderNeeded(!renderNeeded)}
+        />
         <div>
           {comments.map((comment, index) => (
             <Comment
@@ -130,7 +236,10 @@ export default function Recipe() {
           ))}
         </div>
       </div>
-      <div className="sidebar" style={{ flex: "1", backgroundColor: "#579fba" }}></div>
+      <div
+        className="sidebar"
+        style={{ flex: "1", backgroundColor: "#579fba" }}
+      ></div>
     </div>
   );
 }

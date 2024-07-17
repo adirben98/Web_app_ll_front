@@ -4,17 +4,22 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import bread from "../assets/bread.jpeg";
 import { IRecipe } from "./Recipe";
-import apiClient from "../Services/api-client";
+import apiClient, { CanceledError } from "../Services/api-client";
 import User from "../Services/user-service";
 import uploadPhoto from "../Services/file-service";
+import recipeService from "../Services/recipe-service";
+import moment from "moment";
 
 export default function AddRecipe() {
   const [image, setImage] = useState<File>();
   const photoGalleryRef = useRef<HTMLInputElement>(null);
-  const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+  const [options, setOptions] = useState<{ value: string; label: string }[]>(
+    []
+  );
   const [category, setCategory] = useState<string>("");
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredient, setIngredient] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   const {
     setError,
@@ -25,7 +30,6 @@ export default function AddRecipe() {
   } = useForm<IRecipe>();
 
   function handleAddIngredient() {
-
     if (!ingredient.trim()) return;
 
     setIngredients([...ingredients, ingredient.trim()]);
@@ -50,7 +54,7 @@ export default function AddRecipe() {
     return true;
   }
 
-  const user = User.getUser();
+  const user = User.getConnectedUser();
 
   async function onSubmit() {
     console.log(ingredients);
@@ -69,7 +73,7 @@ export default function AddRecipe() {
         instructions: watch("instructions"),
         description: watch("description"),
         image: imageUrl,
-        createdAt: Date.now(),
+        createdAt: moment().format('MMMM Do YYYY, h:mm:ss a'),
         likes: 0,
         likedBy: [],
       };
@@ -81,32 +85,35 @@ export default function AddRecipe() {
       }
     }
   }
-  
-  async function getCategories(signal: AbortSignal) {
-    try {
-
-      const categories = await apiClient.get("/recipe/getCategories",{signal:signal});
-      console.log(categories);
-      const arr = [];
-      for (let i = 0; i < categories.data.length; i++) {
-        arr.push({ value: categories.data[i], label: categories.data[i] });
-      }
-      setOptions(arr);
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
   function handleClick() {
     photoGalleryRef.current?.click();
   }
 
   useEffect(() => {
-    const controller = new AbortController();
-    getCategories(controller.signal)
-    return () => {
-      controller.abort();
+    const { Categories, cancelCategories } = recipeService.getCategories();
+
+    async function getCategories() {
+      try {
+        Categories.then((Categories) => {
+          const arr = [];
+          for (let i = 0; i < Categories.data.length; i++) {
+            arr.push({ value: Categories.data[i], label: Categories.data[i] });
+          }
+          setOptions(arr);
+        });
+        
+       
+        setLoading(false);
+      } catch (err) {
+        if (err instanceof CanceledError) return;
+        console.log(err);
+      }
     }
+    getCategories();
+    return () => {
+      cancelCategories();
+    };
   }, []);
 
   const selectRef = useRef<HTMLSelectElement>(null);
@@ -115,6 +122,25 @@ export default function AddRecipe() {
     e.target.style.height = "auto";
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        ></div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

@@ -1,34 +1,61 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import apiClient from '../Services/api-client'
-import { IRecipe } from './Recipe'
-import RecipeRow from './RecipeRow'
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { CanceledError } from "../Services/api-client";
+import { IRecipe } from "./Recipe";
+import RecipeRow from "./RecipeRow";
+import recipeService from "../Services/recipe-service";
 
 export default function CategoryPage() {
-    const {name}=useParams()  
-    const [recipes,setRecipes]=useState<IRecipe[]>([])
-    const [categories,setCategories]=useState<string[]>([])
-    
-    useEffect(() => {
+  const { name } = useParams();
+  const [recipes, setRecipes] = useState<IRecipe[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-        const controller=new AbortController()
-        async function getData(){
-            try{
-                const Categories = await apiClient.get<string[]>(
-                    "/recipe/getCategories",
-                    { signal: controller.signal }
-                  );
-                  setCategories(Categories.data);
-                const res=await apiClient.get(`/recipe/categorySearch/${name}`,{signal:controller.signal})
-                setRecipes(res.data)
-            }
-            catch(error){
-                console.log(error)
-            }
-        }
-        getData()
-       return ()=>{controller.abort()}
-    },[])
+  useEffect(() => {
+    const { Categories, cancelCategories } = recipeService.getCategories();
+    const { results, cancelSearch } = recipeService.searchCategory(name!);
+    async function getData() {
+      Categories.then((Categories) => setCategories(Categories.data));
+      if (!categories.includes(name!)) {
+        window.location.href = "/404";
+      }
+      results
+        .then((res) => {
+          setRecipes(res.data);
+        })
+        .catch((error) => {
+          if (error instanceof CanceledError) return;
+          console.log(error);
+        });
+
+      setLoading(false);
+    }
+    getData();
+    return () => {
+      cancelCategories();
+      cancelSearch();
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        ></div>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
@@ -56,7 +83,7 @@ export default function CategoryPage() {
           <ul className="dropdown-menu">
             {categories.map((category) => (
               <li key={category}>
-                <Link className="dropdown-item" to={'/recipe'}>
+                <Link className="dropdown-item" to={"/recipe"}>
                   {category}
                 </Link>
               </li>
@@ -74,7 +101,6 @@ export default function CategoryPage() {
           <h2 style={{ color: "#333" }}>
             {name}
             {":"}
-
           </h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
             {recipes.map((recipe) => (
@@ -97,5 +123,5 @@ export default function CategoryPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

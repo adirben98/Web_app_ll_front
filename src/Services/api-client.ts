@@ -28,9 +28,8 @@ apiClient.interceptors.request.use(async (config): Promise<InternalAxiosRequestC
 
       config.headers.Authorization = `Bearer ${accessToken}`;
     } catch (error) {
-
-      if(error instanceof CanceledError ){
-        console.log("Fetch canceled")
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        console.log('Token expired');
       }
 
       const refreshToken = localStorage.getItem('refreshToken');

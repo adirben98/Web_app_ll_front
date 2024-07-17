@@ -6,31 +6,30 @@ import RegisterForm from './Components/RegisterForm';
 import LoginForm from './Components/LoginForm';
 import AddRecipe from './Components/AddRecipe';
 import NotFound from './Components/NotFound';
-import SearchBar from './Components/SearchBar';
 import SearchPage from './Components/SearchPage';
 import CategoryPage from './Components/CategoryPage';
+import HomePage from './Components/HomePage';
+import SearchBar from './Components/SearchBar';
 
 
 function App() {
   
 
-  return (
+  return (<>
+    <SearchBar/>
     <Routes>
-      <Route path="/" element={<SearchBar />} />
+      <Route path="/" element={<HomePage />} />
       <Route path="/search" element={<SearchPage />} />
       <Route path="/category/:name" element={<CategoryPage />} />
-      <Route path="/profile/:id" element={<ProfilePage />} />
+      <Route path="/profile/:name" element={<ProfilePage />} />
       <Route path="/addRecipe" element={<AddRecipe />} />
       <Route path="/recipe/:id" element={<Recipe />} />
       <Route path="/editRecipe/:id" element={<EditRecipe />} />
       <Route path="/register" element={<RegisterForm />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="*" element={<NotFound/>} />
-
-
-
-
       </Routes>
+      </>
   )
 }
 
