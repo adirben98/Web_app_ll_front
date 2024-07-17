@@ -7,10 +7,10 @@ import RegisterForm from './Components/RegisterForm';
 import LoginForm from './Components/LoginForm';
 import AddRecipe from './Components/AddRecipe';
 import NotFound from './Components/NotFound';
+import Chat from './Components/Chat';
 
 
 function App() {
-  
 
   return (
     <Routes>
@@ -20,13 +20,11 @@ function App() {
       <Route path="/editRecipe/:id" element={<EditRecipe />} />
       <Route path="/register" element={<RegisterForm />} />
       <Route path="/login" element={<LoginForm />} />
-      <Route path="*" element={<NotFound/>} />
-
-
-
-
-      </Routes>
+      <Route path="*" element={<NotFound />} />
+      <Route path="/chat" element={<Chat />} />
+    </Routes>
   )
+
 }
 
 export default App
