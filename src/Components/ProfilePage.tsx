@@ -1,25 +1,32 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import User from "../Services/user-service";
 import { IRecipe } from "./Recipe";
-import apiClient,{CanceledError} from "../Services/api-client";
+import apiClient, { CanceledError } from "../Services/api-client";
 import RecipeRow from "./RecipeRow";
 import ChangePassword from "./ChangePassword";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import uploadPhoto from "../Services/file-service";
+import { IUser } from "../Services/auth-service";
+import avatar from "../assets/avatar.png";
+import userService from "../Services/user-service";
+import recipeService from "../Services/recipe-service";
 
 export default function ProfilePage() {
-  const user = User.getUser();
-
-  const [activeTab, setActiveTab] = useState<string>("");
-  const [image, setImage] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>("myRecipes");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [image, setImage] = useState<string>(avatar);
+  const [user, setUser] = useState<IUser>({
+    username: "",
+    email: "",
+    image: avatar,
+    accessToken: "",
+    refreshToken: "",
+  });
   const [myRecipes, setMyRecipes] = useState<IRecipe[]>([]);
   const [foodNowFavorites, setFoodNowFavorites] = useState<IRecipe[]>([]);
   const [renderNeeded, setRenderNeeded] = useState<boolean>(false);
-  const { id } = useParams();
+  const { name } = useParams();
   const [newImage, setNewImage] = useState<File>();
   const photoGalleryRef = useRef<HTMLInputElement>(null);
 
@@ -30,8 +37,7 @@ export default function ProfilePage() {
         username: user.username,
         imgUrl: url,
       });
-      localStorage.setItem("imgUrl", url);
-      setRenderNeeded(prev => !prev)
+      setRenderNeeded((prev) => !prev);
     } catch (error) {
       console.log(error);
     }
@@ -41,33 +47,62 @@ export default function ProfilePage() {
     photoGalleryRef.current?.click();
   }
 
-  async function fetchProfile() {
-    setImage(user.userImg!);
-    setUsername(user.username!);
-    setEmail(user.email!);
-  }
-  async function fetchMyRecipesAndFavorites(signal: AbortSignal) {
-    try {
-      const recipes = await apiClient.get("/recipe/getUserRecipesAndFavorites",{signal:signal});
-      setMyRecipes(recipes.data.recipes);
-      setFoodNowFavorites(recipes.data.favorites);
-    } catch (error) {
-      if(error instanceof CanceledError ){
-        console.log("Fetch canceled")
-      }
-      else{
-      console.log(error);
-        
-      }
-    }
-  }
+  const errorHandler = (error: unknown) => {
+    if (error instanceof CanceledError) return;
+    window.location.href = "/404";
+    console.log(error);
+  };
 
   useEffect(() => {
-    const controller=new AbortController();
+    const { User, cancelUser } = userService.getUser(name!);
+    const { userRecipesAndFavorites, cancelUserRecipesAndFavorites } =
+      recipeService.getUserRecipesAndFavorites(name!);
+
+    async function fetchProfile() {
+      User.then((res) => {
+        setUser(res.data);
+        setImage(res.data.image || avatar);
+      }).catch((error) => {
+        errorHandler(error);
+      });
+
+      userRecipesAndFavorites
+        .then((recipes) => {
+          setMyRecipes(recipes.data.recipes);
+          setFoodNowFavorites(recipes.data.favorites);
+        })
+        .catch((error) => {
+          errorHandler(error);
+        });
+
+      setLoading(false);
+    }
+
     fetchProfile();
-    fetchMyRecipesAndFavorites(controller.signal);
-    return () => {controller.abort()}
-  }, []);
+    return () => {
+      cancelUser();
+      cancelUserRecipesAndFavorites();
+    };
+  }, [name, renderNeeded]);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        ></div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -79,8 +114,8 @@ export default function ProfilePage() {
         style={{ width: "100%", maxWidth: "1000px" }}
       >
         <div className="card">
-          {id === user.username && (
-            <div className=" d-flex justify-content-end">
+          {name === user.username && (
+            <div className="d-flex justify-content-end">
               <span
                 className="text-primary cursor-pointer"
                 onClick={() => setActiveTab("Edit")}
@@ -104,7 +139,7 @@ export default function ProfilePage() {
                     alt="Profile"
                     style={{ width: "120px", height: "120px" }}
                   />
-                  {id === user.username && (
+                  {name === user.username && (
                     <button
                       type="button"
                       className="btn"
@@ -146,11 +181,11 @@ export default function ProfilePage() {
                           className="text-primary font-size-20"
                           style={{ padding: "6px" }}
                         >
-                          {username}
+                          {user.username}
                         </h4>
                         <p className="text-muted fw-medium mb-0">
                           <i className="mdi mdi-email-outline me-2"></i>
-                          {email}
+                          {user.email}
                         </p>
                       </div>
                     </div>
@@ -172,26 +207,26 @@ export default function ProfilePage() {
                         <span className="d-block d-sm-none">
                           <i className="mdi mdi-menu-open"></i>
                         </span>
-                        <span className="d-none d-sm-block">My Recipes</span>
+                        <span className="d-none d-sm-block">Recipes</span>
                       </button>
                     </li>
-                    <li className="nav-item" role="presentation">
-                      <button
-                        className={`nav-link px-4 ${
-                          activeTab === "foodNow" ? "active" : ""
-                        }`}
-                        onClick={() => setActiveTab("foodNow")}
-                        role="tab"
-                        tabIndex={-1}
-                      >
-                        <span className="d-block d-sm-none">
-                          <i className="fas fa-home"></i>
-                        </span>
-                        <span className="d-none d-sm-block">
-                          "Food-Now" Favorites
-                        </span>
-                      </button>
-                    </li>
+                    {name === user.username && (
+                      <li className="nav-item" role="presentation">
+                        <button
+                          className={`nav-link px-4 ${
+                            activeTab === "foodNow" ? "active" : ""
+                          }`}
+                          onClick={() => setActiveTab("foodNow")}
+                          role="tab"
+                          tabIndex={-1}
+                        >
+                          <span className="d-block d-sm-none">
+                            <i className="fas fa-home"></i>
+                          </span>
+                          <span className="d-none d-sm-block">Favorites</span>
+                        </button>
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>
@@ -207,40 +242,50 @@ export default function ProfilePage() {
         <div className="tab-content mt-4">
           {activeTab === "myRecipes" && (
             <div className="tab-pane fade show active">
-              <p>Here is the list of My Recipes.</p>
-              {myRecipes.map((recipe) => (
-                <RecipeRow
-                  key={recipe.name}
-                  id={recipe._id!}
-                  recipeImg={recipe.image}
-                  recipeName={recipe.name}
-                  description={recipe.description}
-                />
-              ))}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                {myRecipes.map((recipe) => (
+                  <div
+                    key={recipe._id}
+                    style={{ flex: "1 1 calc(33.333% - 10px)" }}
+                  >
+                    <RecipeRow
+                      id={recipe._id!}
+                      recipeImg={recipe.image}
+                      recipeName={recipe.name}
+                      description={recipe.description}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
+
           {activeTab === "foodNow" && (
             <div className="tab-pane fade show active">
-              <p>Here is the list of "Food-Now" Favorites.</p>
-              {foodNowFavorites.map((recipe) => (
-                <RecipeRow
-                  id={recipe._id!}
-                  key={recipe.name}
-                  recipeImg={recipe.image}
-                  recipeName={recipe.name}
-                  description={recipe.description}
-                />
-              ))}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                {foodNowFavorites.map((recipe) => (
+                  <div
+                    key={recipe._id}
+                    style={{ flex: "1 1 calc(33.333% - 10px)" }}
+                  >
+                    <RecipeRow
+                      id={recipe._id!}
+                      recipeImg={recipe.image}
+                      recipeName={recipe.name}
+                      description={recipe.description}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           {activeTab === "Edit" && (
             <div className="tab-pane fade show active">
-              <p>Edit profile</p>
               <ChangePassword
                 afterEdit={() => {
                   setActiveTab("");
-                  renderNeeded ? setRenderNeeded(false) : setRenderNeeded(true);
+                  setRenderNeeded((prev) => !prev);
                 }}
               />
             </div>

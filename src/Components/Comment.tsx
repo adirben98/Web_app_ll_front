@@ -1,34 +1,28 @@
 import React, { useState } from 'react';
-import User from '../Services/user-service';
-import apiClient from '../Services/api-client';
-
+import userService from '../Services/user-service';
+import commentService from '../Services/comment-service';
 export interface IComment {
-    _id: string;
+    _id?: string;
   author: string;
   content: string;
   recipeId: string;
-  createdAt: number;
-  edited: boolean;
-  onUpdateHandler: () => void;
+  createdAt: string;
+  edited?: boolean;
+  onUpdateHandler?: () => void;
 }
 
 const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, recipeId,edited, onUpdateHandler }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [newContent, setNewContent] = useState<string>(content);
   async function deleteComment() {
-    try{
-        const res=await apiClient.delete(`/comment/${_id}`)
+      commentService.deleteComment(_id!).then((res) => {
         console.log(res);
-        onUpdateHandler()
-    }
-    catch(error){
-      console.log(error);
-    }
+        onUpdateHandler!()}).catch((error) => console.log(error));
+    
   }
 
   async function handleEdit() {
 
-    try{
     const newComment={
         _id:_id,
         author:author,
@@ -37,13 +31,11 @@ const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, recipeId,e
         createdAt:createdAt,
         edited:true
     }
-    const res=await apiClient.put(`/comment`,newComment)
+    commentService.updateComment(newComment).then((res) => {
     console.log(res);
     setIsEditing(false);
-    onUpdateHandler()
-    }catch(error){
-      console.log(error);
-    }
+    onUpdateHandler!()}).catch((error) => console.log(error));
+    
   }
 
   return (
@@ -58,7 +50,7 @@ const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, recipeId,e
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontWeight: 'bold', marginRight: '10px' }}>{author}</span>
-        <span style={{ fontSize: '0.8em', color: '#666' }}>{new Date(createdAt).toLocaleString()}</span>
+        <span style={{ fontSize: '0.8em', color: '#666' }}>{createdAt}</span>
       </div>
       {isEditing ? (
         <>
@@ -97,7 +89,7 @@ const Comment: React.FC<IComment> = ({ _id,author, content,createdAt, recipeId,e
 
           <p style={{ margin: '10px 0' }}>{content}</p>
           {edited && <span style={{ fontSize: '0.8em', color: '#999' }}>Edited</span>}
-          {User.getUser().username === author && (
+          {userService.getConnectedUser().username === author && (
             <div>
                  <button
               style={{

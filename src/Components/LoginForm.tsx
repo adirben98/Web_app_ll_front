@@ -1,29 +1,17 @@
 import { useForm } from "react-hook-form";
-import apiClient from "../Services/api-client";
-import {setLocalStorage} from "../Services/register-service";
+import registerService, {IUser} from "../Services/auth-service";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
+
 export default function LoginForm() {
-  interface IUser {
-    email: string;
-    username: string;
-    password: string;
-    imgUrl: string;
-    accessToken?: string;
-    refreshToken?: string;
-  }
+
 
   function login() {
     console.log("login");
 
-    apiClient
-      .post<IUser>("/auth/login", {
-        email: watch("email"),
-        password: watch("password"),
-      })
-      .then((response) => {
-        setLocalStorage(response.data)
-        console.log(response);
+   registerService.login(watch("email"), watch("password")!).then((data) => {
+        window.location.href = "/";
+        console.log(data);
       })
       .catch(() => {
         setError("password", { message: "Invalid Email or Password" });
@@ -38,15 +26,10 @@ export default function LoginForm() {
   } = useForm<IUser>();
 
   async function onSuccess(credentials: CredentialResponse) {
-    try {
-      const res = await apiClient.post("auth/googleLogin", {
-        credentials: credentials.credential,
-      });
-      setLocalStorage(res.data);
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-    }
+    registerService.googleLogin(credentials).then((data) => {
+      window.location.href = "/";
+      console.log(data);
+    })
   }
 
   return (

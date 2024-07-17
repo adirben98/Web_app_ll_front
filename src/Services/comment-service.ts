@@ -1,0 +1,27 @@
+import { IComment } from "../Components/Comment";
+import apiClient from "./api-client";
+
+class commentService{
+    getComments(id: string){
+        const controller = new AbortController();
+        const comments = apiClient.get<IComment[]>(`/comment/${id}`, { signal: controller.signal });
+        return {comments, cancelComments:()=>controller.abort()};
+    }
+
+    createComment(comment: IComment){
+        return apiClient.post(`/comment`, comment);
+    }
+
+    updateComment(comment: IComment){
+        return apiClient.put(`/comment/${comment._id}`, comment);
+    }
+
+    deleteComment(id: string){
+        return apiClient.delete(`/comment/${id}`);
+    }
+
+
+
+}
+
+export default new commentService();

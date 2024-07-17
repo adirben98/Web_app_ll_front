@@ -1,13 +1,12 @@
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
-import {  useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { IRecipe } from "./Recipe";
-import apiClient from "../Services/api-client";
+import  { CanceledError } from "../Services/api-client";
 import uploadPhoto from "../Services/file-service";
-import {useParams} from "react-router-dom";
-//fix the paranthesis
-//fix the paranthesis
+import { useParams } from "react-router-dom";
+import recipeService from "../Services/recipe-service";
 
 export default function EditRecipe() {
   const [image, setImage] = useState<string>("");
@@ -16,10 +15,12 @@ export default function EditRecipe() {
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
     []
   );
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [category, setCategory] = useState<string>("");
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredient, setIngredient] = useState<string>("");
-  const {id}=useParams();
+  const { id } = useParams();
 
   const {
     setValue,
@@ -33,7 +34,6 @@ export default function EditRecipe() {
     if (!ingredient.trim()) return;
 
     setIngredients([...ingredients, ingredient.trim()]);
-    
   }
 
   function handleRemoveIngredient(index: number) {
@@ -53,9 +53,9 @@ export default function EditRecipe() {
     return true;
   }
 
-
   async function onSubmit(data: IRecipe) {
-    console.log(ingredients);
+
+
     if (inputValid()) {
       let imageUrl;
       if (newImage) imageUrl = await uploadPhoto(newImage!);
@@ -66,59 +66,70 @@ export default function EditRecipe() {
         _id: id,
         image: imageUrl,
         ingredients: ingredients,
-        category: category
+        category: category,
       };
-      try {
-        const res = await apiClient.put<IRecipe>("/recipe", updatedRecipe);
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
+      const {Recipe} = recipeService.updateRecipe(updatedRecipe);
+
+      Recipe.then((Recipe) => {
+        console.log(Recipe);
+        window.location.href = "/recipe/" + Recipe.data._id;
+      }).catch((error) => {
+        console.log(error);
+      });
     }
   }
-
- 
 
   function handleClick() {
     photoGalleryRef.current?.click();
   }
 
+  const errorHandler = (error: unknown) => {
+    if (error instanceof CanceledError) return;
+    window.location.href = "/404";
+    console.log(error);
+  };
+
   useEffect(() => {
-    async function getData(){
-      try {
-        const controller = new AbortController();
-        const Categories = await apiClient.get("/recipe/getCategories",{signal:controller.signal});
-        
-        const arr = [];
-        for (let i = 0; i < Categories.data.length; i++) {
-          arr.push({ value: Categories.data[i], label: Categories.data[i] });
-        }
-        setOptions(arr);
-    
-        const recipe=(await apiClient.get("/recipe/"+id,{signal:controller.signal})).data;
-        setValue("name",recipe.name);
-        setValue("author",recipe.author);
-        setValue("authorImg",recipe.authorImg);
-        setValue("instructions",recipe.instructions);
-        setValue("description",recipe.description);
-        setImage(recipe.image);
-        setIngredients(recipe.ingredients);
+    const { Categories, cancelCategories } = recipeService.getCategories();
+    const {recipe, cancelRecipe} = recipeService.getRecipe(id!);
+
+    async function getData() {
+        Categories.then((Categories) => {
+          const arr = [];
+          for (let i = 0; i < Categories.data.length; i++) {
+            arr.push({ value: Categories.data[i], label: Categories.data[i] });
+          }
+          setOptions(arr);
+        }).catch((error) => {errorHandler(error);});
+
+        recipe.then((res) => {
+        setValue("name", res.data.name);
+        setValue("author", res.data.author);
+        setValue("authorImg", res.data.authorImg);
+        setValue("instructions", res.data.instructions);
+        setValue("description", res.data.description);
+        setImage(res.data.image);
+        setIngredients(res.data.ingredients);
         const categories = options.slice();
         console.log(ingredients);
-    
-        const userCategoryIndex = categories.findIndex(cat => cat.value === recipe.category);
+
+        const userCategoryIndex = categories.findIndex(
+          (cat) => cat.value === res.data.category
+        );
         if (userCategoryIndex !== -1) {
           const userCategory = categories.splice(userCategoryIndex, 1)[0];
           categories.unshift(userCategory);
         }
-        setCategory(recipe.category);
-        setOptions(categories);
-      }
-      catch(err){
-          console.log(err);
-      }
+        setCategory(res.data.category);
+        setOptions(categories);}).catch((error) => {errorHandler(error);});
+        setLoading(false);
+      
     }
-    getData();    
+    getData();
+    return () => {
+      cancelCategories();
+      cancelRecipe()
+    };
   }, []);
 
   const selectRef = useRef<HTMLSelectElement>(null);
@@ -128,7 +139,24 @@ export default function EditRecipe() {
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
 
- 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        ></div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -157,7 +185,7 @@ export default function EditRecipe() {
               type="file"
               onChange={(event) => {
                 if (event.target.files) {
-                    setNewImage(event.target.files[0]);
+                  setNewImage(event.target.files[0]);
                 }
               }}
             />
@@ -200,9 +228,7 @@ export default function EditRecipe() {
               className="form-control"
               id="ingredients"
               placeholder="ingredients"
-              {...register("ingredients", {
-                
-              })}
+              {...register("ingredients", {})}
               onChange={(e) => setIngredient(e.target.value)}
             />
             <label htmlFor="ingredients">Ingredients</label>
