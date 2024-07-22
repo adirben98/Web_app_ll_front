@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { IRecipe } from "./Recipe";
-import apiClient, { CanceledError } from "../Services/api-client";
+import useAuth, { CanceledError } from "../Services/useAuth";
 import RecipeRow from "./RecipeRow";
 import ChangePassword from "./ChangePassword";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,18 +29,19 @@ export default function ProfilePage() {
   const { name } = useParams();
   const [newImage, setNewImage] = useState<File>();
   const photoGalleryRef = useRef<HTMLInputElement>(null);
+  const { isLoading } = useAuth();
 
   async function uploadCurrentPhoto(photo: File) {
-    try {
-      const url = await uploadPhoto(photo);
-      await apiClient.put("auth/updateUserImg", {
-        username: user.username,
-        imgUrl: url,
+    const url = await uploadPhoto(photo);
+    userService
+      .updateUserImage(url)
+      .then((res) => {
+        console.log(res);
+        setRenderNeeded((prev) => !prev);
+      })
+      .catch((error) => {
+        console.log(error);
       });
-      setRenderNeeded((prev) => !prev);
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   function handleClick() {
@@ -75,7 +76,7 @@ export default function ProfilePage() {
           errorHandler(error);
         });
 
-      setLoading(false);
+      setLoading(isLoading);
     }
 
     fetchProfile();
@@ -83,7 +84,7 @@ export default function ProfilePage() {
       cancelUser();
       cancelUserRecipesAndFavorites();
     };
-  }, [name, renderNeeded]);
+  }, [name, renderNeeded, isLoading]);
 
   if (loading) {
     return (

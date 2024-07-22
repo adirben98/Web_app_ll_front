@@ -1,6 +1,6 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import  { CanceledError } from "../Services/api-client";
+import useAuth, { CanceledError } from "../Services/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import Comment, { IComment } from "./Comment";
@@ -8,7 +8,6 @@ import CommentCreate from "./CommentCreation";
 import userService from "../Services/user-service";
 import recipeService from "../Services/recipe-service";
 import commentService from "../Services/comment-service";
-
 
 export interface IRecipe {
   _id?: string;
@@ -47,12 +46,16 @@ export default function Recipe() {
   const [comments, setComments] = useState<IComment[]>([]);
   const [renderNeeded, setRenderNeeded] = useState<boolean>(false);
 
+const {isLoading}=useAuth()
+
   useEffect(() => {
+    
     const link = document.createElement("link");
     link.href = googleFontUrl;
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
+    
     const { recipe, cancelRecipe } = recipeService.getRecipe(id!);
     const { isLike, cancelLike } = recipeService.isLiked(id!);
     const { comments, cancelComments } = commentService.getComments(id!);
@@ -62,65 +65,64 @@ export default function Recipe() {
       window.location.href = "/404";
       console.log(error);
     }
-    async function getData() {
-      recipe
-        .then((recipe) => setRecipe(recipe.data))
-        .catch((error) => {
-          errorHandler(error);
-        });
+    recipe
+      .then((recipe) => setRecipe(recipe.data))
+      .catch((error) => {
+        errorHandler(error);
+      });
 
-      comments
-        .then((comments) => setComments(comments.data))
-        .catch((error) => {
-          errorHandler(error);
-        });
+    comments
+      .then((comments) => setComments(comments.data))
+      .catch((error) => {
+        errorHandler(error);
+      });
 
-      isLike
-        .then((isLike) => setLike(isLike.data))
-        .catch((error) => {
-          errorHandler(error);
-        });
+    isLike
+      .then((isLike) => setLike(isLike.data))
+      .catch((error) => {
+        errorHandler(error);
+      });
 
-      setLoading(false);
-    }
-
-    getData();
-    return () => {
+    setLoading(isLoading);
+    function cancel(){
       cancelRecipe();
       cancelComments();
       cancelLike();
-    };
-  }, [id, renderNeeded]);
+  
+    }
+
+    return () => cancel()
+  }, [id,isLoading]);
+  
 
   async function likeClick() {
-      if (!like) {
-        recipeService
-          .like(id!)
-          .then(() => {
-            setRecipe((prevRecipe) => ({
-              ...prevRecipe,
-              likes: prevRecipe.likes + 1,
-            }));
-            setLike(true);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } else {
-        recipeService
-          .unlike(id!)
-          .then(() => {
-            setRecipe((prevRecipe) => ({
-              ...prevRecipe,
-              likes: prevRecipe.likes - 1,
-            }));
-            setLike(false);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    
+    if (!like) {
+      recipeService
+        .like(id!)
+        .then(() => {
+          setRecipe((prevRecipe) => ({
+            ...prevRecipe,
+            likes: prevRecipe.likes + 1,
+          }));
+          setLike(true);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      recipeService
+        .unlike(id!)
+        .then(() => {
+          setRecipe((prevRecipe) => ({
+            ...prevRecipe,
+            likes: prevRecipe.likes - 1,
+          }));
+          setLike(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   if (loading) {
@@ -144,10 +146,7 @@ export default function Recipe() {
 
   return (
     <div className="page-container" style={{ display: "flex" }}>
-      <div
-        className="sidebar"
-        style={{ flex: "1", backgroundColor: "#579fba" }}
-      ></div>
+      <div className="sidebar" style={{ flex: "1" }}></div>
       <div
         style={{
           flex: "2",
@@ -155,7 +154,7 @@ export default function Recipe() {
           flexDirection: "column",
           alignItems: "center",
           fontFamily: "sans-serif",
-          backgroundColor: "#FFFDD0",
+          backgroundColor: "#ffffff",
           padding: "20px",
         }}
       >
@@ -164,9 +163,7 @@ export default function Recipe() {
           style={{ width: "80%", maxWidth: "500px", margin: "10px auto" }}
           alt="Recipe"
         />
-        <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>
-          {recipe.name}
-        </h2>
+        <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>{recipe.name}</h2>
         <p style={{ margin: "10px 0" }}>{recipe.description}</p>
         <div
           style={{
@@ -236,10 +233,8 @@ export default function Recipe() {
           ))}
         </div>
       </div>
-      <div
-        className="sidebar"
-        style={{ flex: "1", backgroundColor: "#579fba" }}
-      ></div>
+      <div className="sidebar" style={{ flex: "1" }}></div>
     </div>
   );
+  
 }

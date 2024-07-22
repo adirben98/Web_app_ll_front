@@ -1,53 +1,46 @@
-import  { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import  { CanceledError } from "../Services/api-client";
-import RecipeRow, { recipeRow } from "./RecipeRow";
-import recipeService from "../Services/recipe-service";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import useAuth, { CanceledError } from "../Services/useAuth";
+import RecipeRow from "./RecipeRow";
+import { AxiosResponse } from "axios";
+import { IRecipe } from "./Recipe";
 
-export default function SearchPage() {
+ interface SearchPageProps {
+  searchFunction: (query: string) => {
+    results: Promise<AxiosResponse<IRecipe[], unknown>>;
+    cancelSearch: () => void;
+  };
+}
+
+export default function SearchPage({ searchFunction }: SearchPageProps) {
   const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true);
-  const [searchResults, setSearchResults] = useState<recipeRow[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [searchResults, setSearchResults] = useState<IRecipe[]>([]);
   const params = new URLSearchParams(location.search);
   const queryParam = params.get("q");
+  const {isLoading} = useAuth();
 
   useEffect(() => {
-    const { Categories, cancelCategories } = recipeService.getCategories();
-    const { results, cancelSearch } = recipeService.searchRecipes(queryParam!);
-    async function getData() {
-        Categories.then((Categories) => setCategories(Categories.data));
-        Categories.catch((error) => {
-          if (error instanceof CanceledError) return;
-          console.log(error);
-        });
-        results.then((results) => {
-          const recipes = results.data.map((recipe) => {
-            return {
-              id: recipe._id!,
-              recipeName: recipe.name,
-              recipeImg: recipe.image,
-              description: recipe.description,
-            };
-          });
-          setSearchResults(recipes);
+    if (!queryParam) return;
 
-        })
-        results.catch((error) => {
-          if (error instanceof CanceledError) return;
-          console.log(error);
+    const { results, cancelSearch } = searchFunction(queryParam);
 
-        })
-    
-        setLoading(false);
-      
-    }
-    getData();
+    results
+      .then((res) => {
+        setSearchResults(res.data);
+      })
+      .catch((error) => {
+        if (error instanceof CanceledError) return;
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(isLoading);
+      });
+
     return () => {
-      cancelCategories();
-      cancelSearch()
+      cancelSearch();
     };
-  }, [queryParam]);
+  }, [queryParam, isLoading]);
 
   if (loading) {
     return (
@@ -80,7 +73,7 @@ export default function SearchPage() {
           maxWidth: "1200px",
         }}
       >
-        <div
+        {/* <div
           className="btn-group"
           style={{ marginRight: "20px", height: "10vh" }}
         >
@@ -101,7 +94,7 @@ export default function SearchPage() {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
         <div
           style={{
             flex: 1,
@@ -117,17 +110,17 @@ export default function SearchPage() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
             {searchResults.map((recipe) => (
               <div
-                key={recipe.id}
+                key={recipe._id}
                 style={{
                   flex: "1 1 calc(33.333% - 10px)",
                   boxSizing: "border-box",
                 }}
               >
                 <RecipeRow
-                  recipeImg={recipe.recipeImg}
-                  id={recipe.id}
+                  recipeImg={recipe.image}
+                  id={recipe._id!}
                   description={recipe.description}
-                  recipeName={recipe.recipeName}
+                  recipeName={recipe.name}
                 />
               </div>
             ))}
