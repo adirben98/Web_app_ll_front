@@ -1,0 +1,21 @@
+
+.background {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('../assets/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .content {
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 80%; /* Adjust width as needed */
+    max-width: 1200px; /* Adjust max-width as needed */
+    margin: 20px; /* Adjust margin as needed */
+  }

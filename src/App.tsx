@@ -11,13 +11,17 @@ import CategoryPage from './Components/CategoryPage';
 import HomePage from './Components/HomePage';
 import SearchBar from './Components/SearchBar';
 import Chat from './Components/Chat';
+import Background from './Components/Background';
+
 
 
 function App() {
   
 
   return (<>
+  
     <SearchBar/>
+    <Background>
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/search" element={<SearchPage />} />
@@ -31,8 +35,10 @@ function App() {
       <Route path="*" element={<NotFound/>} />
       <Route path="/chat" element={<Chat />} />
       </Routes>
+      </Background>
       </>
   )
 }
 
 export default App
+
