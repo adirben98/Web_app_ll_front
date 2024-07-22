@@ -32,7 +32,7 @@ function App() {
       <Route path="*" element={<NotFound/>} />
       <Route path="/chat" element={<Chat />} />
       </Routes>
-      </Background>
+      
       </>
   )
 }
