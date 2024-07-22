@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CanceledError } from "../Services/api-client";
+import useAuth,{ CanceledError } from "../Services/useAuth";
 import { IRecipe } from "./Recipe";
 import RecipeRow from "./RecipeRow";
 import recipeService from "../Services/recipe-service";
@@ -11,31 +11,44 @@ export default function CategoryPage() {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const { Categories, cancelCategories } = recipeService.getCategories();
-    const { results, cancelSearch } = recipeService.searchCategory(name!);
-    async function getData() {
-      Categories.then((Categories) => setCategories(Categories.data));
-      if (!categories.includes(name!)) {
-        window.location.href = "/404";
-      }
-      results
-        .then((res) => {
-          setRecipes(res.data);
-        })
-        .catch((error) => {
-          if (error instanceof CanceledError) return;
-          console.log(error);
-        });
+  const { isLoading } = useAuth();
+  const errorHandler = (error: unknown) => {
+    if (error instanceof CanceledError) return;
+    console.log(error);
+  }
 
-      setLoading(false);
-    }
-    getData();
+
+  useEffect(() => {
+
+  
+  
+    const { getCategories, cancelCategories } = recipeService.getCategories();
+    const { results, cancelSearch } = recipeService.searchCategory(name!);
+    const getData = async () => {
+        console.log("starting")
+        getCategories.then((res) => {
+        setCategories(res.data);
+        console.log(res)
+        if (!categories.includes(name!)) {
+          window.location.href = "/404";
+        }
+        }
+          ).catch((err)=>{errorHandler(err)})
+        
+        results.then((res2) =>{
+          setRecipes(res2.data);
+
+        }).catch((err)=>{errorHandler(err)})
+      
+      setLoading(isLoading);
+    };
+      getData();
     return () => {
+
       cancelCategories();
       cancelSearch();
     };
-  }, []);
+  }, [name,isLoading]);
 
   if (loading) {
     return (

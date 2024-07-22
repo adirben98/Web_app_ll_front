@@ -25,7 +25,7 @@ export default function LoginForm() {
     setError,
   } = useForm<IUser>();
 
-  async function onSuccess(credentials: CredentialResponse) {
+  function onSuccess(credentials: CredentialResponse) {
     registerService.googleLogin(credentials).then((data) => {
       window.location.href = "/";
       console.log(data);

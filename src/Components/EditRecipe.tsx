@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IRecipe } from "./Recipe";
-import  { CanceledError } from "../Services/api-client";
+import  useAuth, { CanceledError } from "../Services/useAuth";
 import uploadPhoto from "../Services/file-service";
 import { useParams } from "react-router-dom";
 import recipeService from "../Services/recipe-service";
@@ -21,6 +21,7 @@ export default function EditRecipe() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredient, setIngredient] = useState<string>("");
   const { id } = useParams();
+  const {isLoading} = useAuth();
 
   const {
     setValue,
@@ -89,12 +90,14 @@ export default function EditRecipe() {
     console.log(error);
   };
 
+
   useEffect(() => {
-    const { Categories, cancelCategories } = recipeService.getCategories();
+    
+    const { getCategories, cancelCategories } = recipeService.getCategories();
     const {recipe, cancelRecipe} = recipeService.getRecipe(id!);
 
     async function getData() {
-        Categories.then((Categories) => {
+        getCategories.then((Categories) => {
           const arr = [];
           for (let i = 0; i < Categories.data.length; i++) {
             arr.push({ value: Categories.data[i], label: Categories.data[i] });
@@ -122,7 +125,7 @@ export default function EditRecipe() {
         }
         setCategory(res.data.category);
         setOptions(categories);}).catch((error) => {errorHandler(error);});
-        setLoading(false);
+        setLoading(isLoading);
       
     }
     getData();
@@ -130,7 +133,7 @@ export default function EditRecipe() {
       cancelCategories();
       cancelRecipe()
     };
-  }, []);
+  }, [isLoading]);
 
   const selectRef = useRef<HTMLSelectElement>(null);
 

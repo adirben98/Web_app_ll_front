@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import bread from "../assets/bread.jpeg";
 import { IRecipe } from "./Recipe";
-import apiClient, { CanceledError } from "../Services/api-client";
+import useAuth, { CanceledError } from "../Services/useAuth";
 import User from "../Services/user-service";
 import uploadPhoto from "../Services/file-service";
 import recipeService from "../Services/recipe-service";
@@ -20,6 +20,7 @@ export default function AddRecipe() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredient, setIngredient] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const { isLoading } = useAuth();
 
   const {
     setError,
@@ -73,16 +74,17 @@ export default function AddRecipe() {
         instructions: watch("instructions"),
         description: watch("description"),
         image: imageUrl,
-        createdAt: moment().format('MMMM Do YYYY, h:mm:ss a'),
+        createdAt: moment().format("MMMM Do YYYY, h:mm:ss a"),
         likes: 0,
         likedBy: [],
       };
-      try {
-        const res = await apiClient.post<IRecipe>("/recipe", newRecipe);
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
+      
+        recipeService.createRecipe(newRecipe).then((res) => {
+          console.log(res);
+          window.location.href = "/";
+        });
+
+      
     }
   }
 
@@ -91,30 +93,27 @@ export default function AddRecipe() {
   }
 
   useEffect(() => {
-    const { Categories, cancelCategories } = recipeService.getCategories();
+    const { getCategories, cancelCategories } = recipeService.getCategories();
 
-    async function getCategories() {
-      try {
-        Categories.then((Categories) => {
+    async function Categories() {
+      getCategories
+        .then((Categories) => {
           const arr = [];
           for (let i = 0; i < Categories.data.length; i++) {
             arr.push({ value: Categories.data[i], label: Categories.data[i] });
           }
           setOptions(arr);
+        })
+        .catch((err) => {
+          if (err instanceof CanceledError) return;
+          console.log(err);
         });
-        
-       
-        setLoading(false);
-      } catch (err) {
-        if (err instanceof CanceledError) return;
-        console.log(err);
-      }
+
+      setLoading(isLoading);
     }
-    getCategories();
-    return () => {
-      cancelCategories();
-    };
-  }, []);
+    Categories();
+    return () => cancelCategories();
+  }, [isLoading]);
 
   const selectRef = useRef<HTMLSelectElement>(null);
 

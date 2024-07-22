@@ -9,22 +9,19 @@ import NotFound from './Components/NotFound';
 import SearchPage from './Components/SearchPage';
 import CategoryPage from './Components/CategoryPage';
 import HomePage from './Components/HomePage';
-import SearchBar from './Components/SearchBar';
 import Chat from './Components/Chat';
-import Background from './Components/Background';
-
+import recipeService from './Services/recipe-service';
 
 
 function App() {
   
 
   return (<>
-  
-    <SearchBar/>
-    <Background>
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/search" element={<SearchPage />} />
+      
+      <Route path="/search" element={<SearchPage searchFunction={recipeService.searchRecipes} />} />
+      <Route path="/searchFromApi" element={<SearchPage searchFunction={recipeService.searchFromApi} />} />
       <Route path="/category/:name" element={<CategoryPage />} />
       <Route path="/profile/:name" element={<ProfilePage />} />
       <Route path="/addRecipe" element={<AddRecipe />} />

@@ -1,5 +1,5 @@
 import { CredentialResponse } from "@react-oauth/google";
-import apiClient from "./api-client";
+import {apiClient} from "./useAuth";
 
 export interface IUser {
   email: string;
