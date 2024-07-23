@@ -94,7 +94,7 @@ export default function EditRecipe() {
   useEffect(() => {
     
     const { getCategories, cancelCategories } = recipeService.getCategories();
-    const {recipe, cancelRecipe} = recipeService.getRecipe(id!);
+    const {getRecipe, cancelRecipe} = recipeService.getRecipe(id!);
 
     async function getData() {
         getCategories.then((Categories) => {
@@ -105,7 +105,7 @@ export default function EditRecipe() {
           setOptions(arr);
         }).catch((error) => {errorHandler(error);});
 
-        recipe.then((res) => {
+        getRecipe.then((res) => {
         setValue("name", res.data.name);
         setValue("author", res.data.author);
         setValue("authorImg", res.data.authorImg);
