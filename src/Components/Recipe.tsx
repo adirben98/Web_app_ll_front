@@ -92,7 +92,7 @@ const {isLoading}=useAuth()
     }
 
     return () => cancel()
-  }, [id,isLoading]);
+  }, [id,isLoading,renderNeeded]);
   
 
   async function likeClick() {
@@ -216,7 +216,7 @@ const {isLoading}=useAuth()
         <CommentCreate
           author={userService.getConnectedUser().username!}
           recipeId={`${id}`}
-          handle={() => setRenderNeeded(!renderNeeded)}
+          handle={() => setRenderNeeded(prev=>!prev)}
         />
         <div>
           {comments.map((comment, index) => (
@@ -228,7 +228,7 @@ const {isLoading}=useAuth()
               recipeId={comment.recipeId}
               createdAt={comment.createdAt}
               edited={comment.edited}
-              onUpdateHandler={() => setRenderNeeded(!renderNeeded)}
+              onUpdateHandler={() => setRenderNeeded(prev=>!prev)}
             />
           ))}
         </div>

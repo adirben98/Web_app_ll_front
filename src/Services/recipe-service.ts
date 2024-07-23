@@ -72,7 +72,7 @@ class RecipeService {
 
   updateRecipe(recipe: IRecipe) {
     const controller = new AbortController();
-    const Recipe = apiClient.put(`/recipe/${recipe._id}`, recipe);
+    const Recipe = apiClient.put(`/recipe`, recipe);
     return { Recipe, cancelUpdate: () => controller.abort() };
   }
 
