@@ -117,6 +117,7 @@ export default function HomePage() {
           </ul>
         </div>
         <div
+        
           style={{
             flex: 1,
             padding: "20px",

@@ -229,18 +229,22 @@ export default function Recipe() {
           margin: "20px 0",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>
-        <img
-            src={recipe.authorImg}
-            style={{ borderRadius: "50%", width: "50px", height: "50px", cursor: "pointer" }}
-            alt="Author"
-            onClick={() => window.location.href = `/profile/${recipe.author}`}
-          />
-          <h3 style={{ marginLeft: "20px" }}>{recipe.author}</h3>
-          <h5 style={{ marginTop: "25px", fontSize: "12px", fontWeight: "normal" }}>Created At</h5>
-          <p style={{ fontSize: "12px", margin: "0" }}>{recipe.createdAt}</p>
-
-        </div>
+      <div style={{ display: "flex", alignItems: "center" }}>
+  <img
+    src={recipe.authorImg}
+    style={{ borderRadius: "50%", width: "50px", height: "50px", cursor: "pointer" }}
+    alt="Author"
+    onClick={() => window.location.href = `/profile/${recipe.author}`}
+  />
+  <h3 style={{ marginLeft: "10x" }}>{recipe.author}</h3>
+  <div style={{ display: "flex", alignItems: "center", marginLeft: "5px" }}>
+    <span style={{ margin: "5px" }}>|</span>
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <h5 style={{ fontSize: "14px", fontWeight: "bold", margin: 0 }}>Created At:</h5>
+      <p style={{ fontSize: "12px", fontWeight: "bold", margin: "0 0 0 10px" }}>{recipe.createdAt}</p>
+    </div>
+  </div>
+</div>
         <div style={{ display: "flex", alignItems: "center" }}>
           {userService.getConnectedUser().username !== recipe.author && (
             <button
