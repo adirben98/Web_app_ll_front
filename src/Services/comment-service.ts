@@ -13,7 +13,7 @@ class commentService{
     }
 
     updateComment(comment: IComment){
-        return apiClient.put(`/comment/${comment._id}`, comment);
+        return apiClient.put(`/comment`, comment);
     }
 
     deleteComment(id: string){
