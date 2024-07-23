@@ -45,8 +45,19 @@ export default function Recipe() {
   const [like, setLike] = useState<boolean>(false);
   const [comments, setComments] = useState<IComment[]>([]);
   const [renderNeeded, setRenderNeeded] = useState<boolean>(false);
+  const [istheAuthor, setIsTheAuthor] = useState<boolean>(false);
 
   const { isLoading } = useAuth();
+
+  function deleteRecipe() {
+    recipeService
+      .deleteRecipe(id!)
+      .then(() => {
+        window.location.href = "/";
+      })
+      .catch((error) => {
+        console.log(error);
+      });}
 
   useEffect(() => {
     const link = document.createElement("link");
@@ -54,7 +65,7 @@ export default function Recipe() {
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    const { recipe, cancelRecipe } = recipeService.getRecipe(id!);
+    const { getRecipe, cancelRecipe } = recipeService.getRecipe(id!);
     const { isLike, cancelLike } = recipeService.isLiked(id!);
     const { comments, cancelComments } = commentService.getComments(id!);
 
@@ -63,12 +74,16 @@ export default function Recipe() {
       window.location.href = "/404";
       console.log(error);
     }
-    recipe
+    const user=userService.getConnectedUser();
+    if(user.username===recipe.author){
+      setIsTheAuthor(true);
+    }
+    getRecipe
       .then((recipe) => setRecipe(recipe.data))
       .catch((error) => {
         errorHandler(error);
-      });
-
+    });
+  
     comments
       .then((comments) => setComments(comments.data))
       .catch((error) => {
@@ -176,32 +191,34 @@ export default function Recipe() {
           <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>
             {recipe.name}
           </h2>
-          <div style={{ marginLeft:'40px', display: "flex", alignItems: "center" }}>
-            <button
-              type="button"
-              className="btn"
-              onClick={() => {
+          {istheAuthor && (
+             <div style={{ display: "flex", alignItems: "center" }}>
+             <button
+               type="button"
+               className="btn"
+               onClick={() => {
                 window.location.href = `/editRecipe/${id}`;
-              }}
-              style={{ marginRight: "10px" }}
-            >
-              <FontAwesomeIcon
-                icon={faPenToSquare}
-                className="fa-xl tinted-icon"
-              />
-            </button>
-            <button
-              type="button"
-              className="btn"
-              onClick={() => {
-                deleteRecipe();
-              }}
-              style={{ marginRight: "10px" }}
-            >
-              <FontAwesomeIcon icon={faTrash} className="fa-xl tinted-icon" />
-            </button>
-          </div>
-        </div>
+               }}
+               style={{ marginRight: "10px" }}
+             >
+               <FontAwesomeIcon
+                 icon={faPenToSquare}
+                 className="fa-xl tinted-icon"
+               />
+             </button>
+             <button
+               type="button"
+               className="btn"
+               onClick={() => {
+                 deleteRecipe();
+               }}
+               style={{ marginRight: "10px" }}
+             >
+               <FontAwesomeIcon icon={faTrash} className="fa-xl tinted-icon" />
+             </button>
+           </div>
+    )}
+      </div>
       <p style={{ margin: "10px 0", textAlign: "center" }}>{recipe.description}</p>
       <div
         style={{
@@ -220,6 +237,9 @@ export default function Recipe() {
             onClick={() => window.location.href = `/profile/${recipe.author}`}
           />
           <h3 style={{ marginLeft: "20px" }}>{recipe.author}</h3>
+          <h5 style={{ marginTop: "25px", fontSize: "12px", fontWeight: "normal" }}>Created At</h5>
+          <p style={{ fontSize: "12px", margin: "0" }}>{recipe.createdAt}</p>
+
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>
           {userService.getConnectedUser().username !== recipe.author && (
@@ -253,8 +273,6 @@ export default function Recipe() {
         </ul>
         <h2 style={{ marginTop: "25px" }}>Instructions</h2>
         <p>{recipe.instructions}</p>
-        <h2 style={{ marginTop: "25px" }}>Created At</h2>
-        <p>{recipe.createdAt}</p>
       </div>
       <h2 style={{ marginTop: "50px", textAlign: "center" }}>Comments</h2>
       <CommentCreate
