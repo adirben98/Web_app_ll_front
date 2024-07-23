@@ -23,6 +23,7 @@ export default function ProfilePage() {
     accessToken: "",
     refreshToken: "",
   });
+
   const [myRecipes, setMyRecipes] = useState<IRecipe[]>([]);
   const [foodNowFavorites, setFoodNowFavorites] = useState<IRecipe[]>([]);
   const [renderNeeded, setRenderNeeded] = useState<boolean>(false);
@@ -30,6 +31,7 @@ export default function ProfilePage() {
   const [newImage, setNewImage] = useState<File>();
   const photoGalleryRef = useRef<HTMLInputElement>(null);
   const { isLoading } = useAuth();
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null);
 
   async function uploadCurrentPhoto(photo: File) {
     const url = await uploadPhoto(photo);
@@ -58,6 +60,7 @@ export default function ProfilePage() {
     const { User, cancelUser } = userService.getUser(name!);
     const { userRecipesAndFavorites, cancelUserRecipesAndFavorites } =
       recipeService.getUserRecipesAndFavorites(name!);
+      setCurrentUser(userService.getConnectedUser())
 
     async function fetchProfile() {
       User.then((res) => {
@@ -115,7 +118,7 @@ export default function ProfilePage() {
         style={{ width: "100%", maxWidth: "1000px" }}
       >
         <div className="card">
-          {name === user.username && (
+          { currentUser?.username=== user.username && (
             <div className="d-flex justify-content-end">
               <span
                 className="text-primary cursor-pointer"
@@ -140,7 +143,7 @@ export default function ProfilePage() {
                     alt="Profile"
                     style={{ width: "120px", height: "120px" }}
                   />
-                  {name === user.username && (
+                  {currentUser?.username === user.username && (
                     <button
                       type="button"
                       className="btn"
@@ -211,7 +214,7 @@ export default function ProfilePage() {
                         <span className="d-none d-sm-block">Recipes</span>
                       </button>
                     </li>
-                    {name === user.username && (
+                    {currentUser?.username === user.username && (
                       <li className="nav-item" role="presentation">
                         <button
                           className={`nav-link px-4 ${
