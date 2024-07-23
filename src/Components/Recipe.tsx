@@ -294,6 +294,6 @@ export default function Recipe() {
           />
         ))}
       </div>
-    </div>
-  );
+ </div>
+);
 }

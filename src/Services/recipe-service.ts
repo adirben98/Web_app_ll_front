@@ -60,10 +60,10 @@ class RecipeService {
 
   getRecipe(id: string) {
     const controller = new AbortController();
-    const recipe = apiClient.get<IRecipe>(`/recipe/${id}`, {
+    const getRecipe = apiClient.get<IRecipe>(`/recipe/${id}`, {
       signal: controller.signal,
     });
-    return { recipe, cancelRecipe: () => controller.abort() };
+    return { getRecipe, cancelRecipe: () => controller.abort() };
   }
 
   createRecipe(recipe: IRecipe) {
