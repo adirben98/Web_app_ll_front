@@ -9,13 +9,14 @@ class userService {
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
 
-    return {
-      username: username,
-      email: email,
-      userImg: userImg,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    };
+    const user: IUser = {
+      username: username!,
+      email: email!,
+      image: userImg!,
+      accessToken: accessToken!,
+      refreshToken: refreshToken!,
+    }
+    return user
   }
 
   getUser(name:string){
