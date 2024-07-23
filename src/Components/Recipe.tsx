@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useAuth, { CanceledError } from "../Services/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Comment, { IComment } from "./Comment";
 import CommentCreate from "./CommentCreation";
 import userService from "../Services/user-service";
@@ -46,16 +46,14 @@ export default function Recipe() {
   const [comments, setComments] = useState<IComment[]>([]);
   const [renderNeeded, setRenderNeeded] = useState<boolean>(false);
 
-const {isLoading}=useAuth()
+  const { isLoading } = useAuth();
 
   useEffect(() => {
-    
     const link = document.createElement("link");
     link.href = googleFontUrl;
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    
     const { recipe, cancelRecipe } = recipeService.getRecipe(id!);
     const { isLike, cancelLike } = recipeService.isLiked(id!);
     const { comments, cancelComments } = commentService.getComments(id!);
@@ -84,16 +82,14 @@ const {isLoading}=useAuth()
       });
 
     setLoading(isLoading);
-    function cancel(){
+    function cancel() {
       cancelRecipe();
       cancelComments();
       cancelLike();
-  
     }
 
-    return () => cancel()
-  }, [id,isLoading]);
-  
+    return () => cancel();
+  }, [id, isLoading, renderNeeded]);
 
   async function likeClick() {
     if (!like) {
@@ -145,96 +141,141 @@ const {isLoading}=useAuth()
   }
 
   return (
-    <div className="page-container" style={{ display: "flex" }}>
-      <div className="sidebar" style={{ flex: "1" }}></div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        fontFamily: "'Open Sans', sans-serif",
+        backgroundColor: "#ffffff",
+        padding: "20px",
+        minHeight: "100vh", 
+      }}
+    >
       <div
         style={{
-          flex: "2",
+          height: "400px", 
+          width: "100%",
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
-          fontFamily: "sans-serif",
-          backgroundColor: "#ffffff",
-          padding: "20px",
+          justifyContent: "center",
+          position: "relative",
         }}
       >
         <img
           src={recipe.image}
-          style={{ width: "80%", maxWidth: "500px", margin: "10px auto" }}
+          style={{
+            width: "500px",
+            height: "100%",
+            objectFit: "cover",
+          }}
           alt="Recipe"
         />
-        <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>{recipe.name}</h2>
-        <p style={{ margin: "10px 0" }}>{recipe.description}</p>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            margin: "20px 0",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <h3 style={{ marginRight: "20px" }}>{recipe.author}</h3>
-            <img
-              src={recipe.authorImg}
-              style={{ borderRadius: "50%", width: "50px", height: "50px" }}
-              alt="Author"
-            />
+      </div>
+      <div>
+          <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>
+            {recipe.name}
+          </h2>
+          <div style={{ marginLeft:'40px', display: "flex", alignItems: "center" }}>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                window.location.href = `/editRecipe/${id}`;
+              }}
+              style={{ marginRight: "10px" }}
+            >
+              <FontAwesomeIcon
+                icon={faPenToSquare}
+                className="fa-xl tinted-icon"
+              />
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                deleteRecipe();
+              }}
+              style={{ marginRight: "10px" }}
+            >
+              <FontAwesomeIcon icon={faTrash} className="fa-xl tinted-icon" />
+            </button>
           </div>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {userService.getConnectedUser().username !== recipe.author && (
-              <button
-                type="button"
-                className="btn"
-                onClick={likeClick}
-                style={{ marginRight: "10px" }}
-              >
-                <FontAwesomeIcon
-                  icon={faThumbsUp}
-                  className="fa-xl tinted-icon"
-                  style={{ color: like ? "green" : "inherit" }}
-                />
-              </button>
-            )}
-            <span style={{ padding: "25px 20px" }}>Likes: {recipe.likes}</span>
-          </div>
+        </div>
+      <p style={{ margin: "10px 0", textAlign: "center" }}>{recipe.description}</p>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+          margin: "20px 0",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+            src={recipe.authorImg}
+            style={{ borderRadius: "50%", width: "50px", height: "50px", cursor: "pointer" }}
+            alt="Author"
+            onClick={() => window.location.href = `/profile/${recipe.author}`}
+          />
+          <h3 style={{ marginLeft: "20px" }}>{recipe.author}</h3>
         </div>
-        <div style={{ width: "100%" }}>
-          <h2>Ingredients</h2>
-          <ul>
-            {recipe.ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
-          </ul>
-          <h2 style={{ marginTop: "25px" }}>Instructions</h2>
-          <p>{recipe.instructions}</p>
-          <h2 style={{ marginTop: "25px" }}>Created At</h2>
-          <p>{recipe.createdAt}</p>
-        </div>
-        <h2 style={{ marginTop: "50px", textAlign: "center" }}>Comments</h2>
-        <CommentCreate
-          author={userService.getConnectedUser().username!}
-          recipeId={`${id}`}
-          handle={() => setRenderNeeded(!renderNeeded)}
-        />
-        <div>
-          {comments.map((comment, index) => (
-            <Comment
-              key={index}
-              _id={comment._id}
-              author={comment.author}
-              content={comment.content}
-              recipeId={comment.recipeId}
-              createdAt={comment.createdAt}
-              edited={comment.edited}
-              onUpdateHandler={() => setRenderNeeded(!renderNeeded)}
-            />
-          ))}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {userService.getConnectedUser().username !== recipe.author && (
+            <button
+              type="button"
+              className="btn"
+              onClick={likeClick}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                marginRight: "10px",
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faThumbsUp}
+                className={`fa-xl tinted-icon ${like ? "liked" : ""}`}
+                style={{ color: like ? "green" : "inherit" }}
+              />
+            </button>
+          )}
+          <span style={{ padding: "25px 20px" }}>Likes: {recipe.likes}</span>
         </div>
       </div>
-      <div className="sidebar" style={{ flex: "1" }}></div>
+      <div style={{ width: "100%" }}>
+        <h2>Ingredients</h2>
+        <ul>
+          {recipe.ingredients.map((ingredient, index) => (
+            <li key={index}>{ingredient}</li>
+          ))}
+        </ul>
+        <h2 style={{ marginTop: "25px" }}>Instructions</h2>
+        <p>{recipe.instructions}</p>
+        <h2 style={{ marginTop: "25px" }}>Created At</h2>
+        <p>{recipe.createdAt}</p>
+      </div>
+      <h2 style={{ marginTop: "50px", textAlign: "center" }}>Comments</h2>
+      <CommentCreate
+        author={userService.getConnectedUser().username!}
+        recipeId={`${id}`}
+        handle={() => setRenderNeeded(!renderNeeded)}
+      />
+      <div>
+        {comments.map((comment, index) => (
+          <Comment
+            key={index}
+            _id={comment._id}
+            author={comment.author}
+            content={comment.content}
+            recipeId={comment.recipeId}
+            createdAt={comment.createdAt}
+            edited={comment.edited}
+            onUpdateHandler={() => setRenderNeeded(!renderNeeded)}
+          />
+        ))}
+      </div>
     </div>
   );
-  
 }
