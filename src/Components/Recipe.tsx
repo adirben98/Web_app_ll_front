@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useAuth, { CanceledError } from "../Services/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPenToSquare,
+  faThumbsUp,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import Comment, { IComment } from "./Comment";
 import CommentCreate from "./CommentCreation";
 import userService from "../Services/user-service";
@@ -46,16 +50,14 @@ export default function Recipe() {
   const [comments, setComments] = useState<IComment[]>([]);
   const [renderNeeded, setRenderNeeded] = useState<boolean>(false);
 
-const {isLoading}=useAuth()
+  const { isLoading } = useAuth();
 
   useEffect(() => {
-    
     const link = document.createElement("link");
     link.href = googleFontUrl;
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    
     const { recipe, cancelRecipe } = recipeService.getRecipe(id!);
     const { isLike, cancelLike } = recipeService.isLiked(id!);
     const { comments, cancelComments } = commentService.getComments(id!);
@@ -84,16 +86,25 @@ const {isLoading}=useAuth()
       });
 
     setLoading(isLoading);
-    function cancel(){
+    function cancel() {
       cancelRecipe();
       cancelComments();
       cancelLike();
-  
     }
 
-    return () => cancel()
-  }, [id,isLoading,renderNeeded]);
-  
+    return () => cancel();
+  }, [id, isLoading, renderNeeded]);
+
+  function deleteRecipe() {
+    recipeService
+      .deleteRecipe(id!)
+      .then(() => {
+        window.location.href = "/";
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
   async function likeClick() {
     if (!like) {
@@ -163,7 +174,37 @@ const {isLoading}=useAuth()
           style={{ width: "80%", maxWidth: "500px", margin: "10px auto" }}
           alt="Recipe"
         />
-        <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>{recipe.name}</h2>
+        <div>
+          <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>
+            {recipe.name}
+          </h2>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                window.location.href = `/editRecipe/${id}`;
+              }}
+              style={{ marginRight: "10px" }}
+            >
+              <FontAwesomeIcon
+                icon={faPenToSquare}
+                className="fa-xl tinted-icon"
+              />
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                deleteRecipe();
+              }}
+              style={{ marginRight: "10px" }}
+            >
+              <FontAwesomeIcon icon={faTrash} className="fa-xl tinted-icon" />
+            </button>
+          </div>
+        </div>
+
         <p style={{ margin: "10px 0" }}>{recipe.description}</p>
         <div
           style={{
@@ -175,12 +216,16 @@ const {isLoading}=useAuth()
           }}
         >
           <div style={{ display: "flex", alignItems: "center" }}>
-            <h3 style={{ marginRight: "20px" }}>{recipe.author}</h3>
-            <img
+          <img
               src={recipe.authorImg}
-              style={{ borderRadius: "50%", width: "50px", height: "50px" }}
+              style={{ borderRadius: "50%", width: "50px", height: "50px", cursor: "pointer" }}
               alt="Author"
+              onClick={() => {
+                window.location.href = `/profile/${recipe.author}`;
+              }}
             />
+            <h3 onClick={()=>window.location.href='/profile/'+recipe.author} style={{ marginRight: "20px" }}>{recipe.author}</h3>
+          
           </div>
           <div style={{ display: "flex", alignItems: "center" }}>
             {userService.getConnectedUser().username !== recipe.author && (
@@ -216,7 +261,7 @@ const {isLoading}=useAuth()
         <CommentCreate
           author={userService.getConnectedUser().username!}
           recipeId={`${id}`}
-          handle={() => setRenderNeeded(prev=>!prev)}
+          handle={() => setRenderNeeded((prev) => !prev)}
         />
         <div>
           {comments.map((comment, index) => (
@@ -228,7 +273,7 @@ const {isLoading}=useAuth()
               recipeId={comment.recipeId}
               createdAt={comment.createdAt}
               edited={comment.edited}
-              onUpdateHandler={() => setRenderNeeded(prev=>!prev)}
+              onUpdateHandler={() => setRenderNeeded((prev) => !prev)}
             />
           ))}
         </div>
@@ -236,5 +281,4 @@ const {isLoading}=useAuth()
       <div className="sidebar" style={{ flex: "1" }}></div>
     </div>
   );
-  
 }

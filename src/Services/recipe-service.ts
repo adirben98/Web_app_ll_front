@@ -105,6 +105,10 @@ class RecipeService {
   unlike(id: string) {
     return apiClient.post(`/recipe/unlike/${id}`);
   }
+
+  deleteRecipe(id: string) {
+    return apiClient.delete(`/recipe/${id}`);
+  }
 }
 
 export default new RecipeService();
