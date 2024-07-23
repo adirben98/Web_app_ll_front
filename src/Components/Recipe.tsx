@@ -237,8 +237,8 @@ export default function Recipe() {
     onClick={() => window.location.href = `/profile/${recipe.author}`}
   />
   <h3 style={{ marginLeft: "10x" }}>{recipe.author}</h3>
-  <div style={{ display: "flex", alignItems: "center", marginLeft: "5px" }}>
-    <span style={{ margin: "5px" }}>|</span>
+  <div style={{ display: "flex", alignItems: "center", marginLeft: "10px" }}>
+    <span style={{ margin: "0 10px" }}>|</span>
     <div style={{ display: "flex", alignItems: "center" }}>
       <h5 style={{ fontSize: "14px", fontWeight: "bold", margin: 0 }}>Created At:</h5>
       <p style={{ fontSize: "12px", fontWeight: "bold", margin: "0 0 0 10px" }}>{recipe.createdAt}</p>

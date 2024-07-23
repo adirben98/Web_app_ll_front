@@ -168,19 +168,42 @@ export default function EditRecipe() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          minHeight: "100vh",
+          padding: "20px",
+          backgroundColor: "#f9f9f9"
         }}
       >
-        <div style={{ width: "300px", textAlign: "center" }}>
-          <h1 style={{ marginBottom: "50px" }}>New Recipe</h1>
-          <div style={{ marginBottom: "20px" }}>
+        <div style={{
+          width: "100%",
+          backgroundColor: "#fff",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          padding: "20px",
+          margin: "0 auto",
+          maxWidth: "1000px"  // Optional: Set a maxWidth if you want to limit the maximum width
+        }}>
+          <h1 style={{ marginBottom: "20px", fontSize: "24px", fontWeight: "600", color: "#333" }}>Edit Recipe</h1>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
             <img
               src={newImage ? URL.createObjectURL(newImage) : image}
-              style={{ width: "100%", margin: "10px" }}
+              style={{ 
+                width: "100%", 
+                maxHeight: "300px", 
+                objectFit: "contain",  // Ensures the whole image is shown without cropping
+                borderRadius: "8px", 
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" 
+              }}
+              alt="Recipe"
             />
           </div>
-          <div style={{ marginRight: "300px" }}>
-            <button type="button" className="btn" onClick={handleClick}>
-              <FontAwesomeIcon icon={faImage} className="fa-xl" />
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={handleClick}
+              style={{ borderRadius: "50%", padding: "10px" }}
+            >
+              <FontAwesomeIcon icon={faImage} />
             </button>
             <input
               style={{ display: "none" }}
@@ -193,17 +216,17 @@ export default function EditRecipe() {
               }}
             />
           </div>
-
           <div className="form-floating mb-3">
             <input
-              type="name"
+              type="text"
               className="form-control"
               id="name"
               placeholder="Recipe Name"
               {...register("name", { required: "Recipe name is required" })}
+              style={{ borderRadius: "8px", padding: "15px", paddingTop: "30px" }}
             />
             <label htmlFor="name">Recipe Name</label>
-            {errors.name && <span>{errors.name.message}</span>}
+            {errors.name && <span style={{ color: "red" }}>{errors.name.message}</span>}
           </div>
           <div className="form-group mb-3">
             <select
@@ -214,6 +237,7 @@ export default function EditRecipe() {
                 setCategory(selectedOption.target.value);
               }}
               ref={selectRef}
+              style={{ borderRadius: "8px", padding: "10px" }}
             >
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -222,42 +246,45 @@ export default function EditRecipe() {
               ))}
             </select>
             {errors.category && (
-              <p className="text-danger">{errors.category.message}</p>
+              <p style={{ color: "red" }}>{errors.category.message}</p>
             )}
           </div>
           <div className="form-floating mb-3">
             <input
-              type="ingredients"
+              type="text"
               className="form-control"
               id="ingredients"
-              placeholder="ingredients"
-              {...register("ingredients", {})}
+              placeholder="Ingredients"
+              {...register("ingredients")}
               onChange={(e) => setIngredient(e.target.value)}
+              style={{ borderRadius: "8px", padding: "15px", paddingTop: "35px" }}
             />
             <label htmlFor="ingredients">Ingredients</label>
-            {errors.ingredients && <span>{errors.ingredients.message}</span>}
+            {errors.ingredients && <span style={{ color: "red" }}>{errors.ingredients.message}</span>}
             <button
               type="button"
               className="btn btn-secondary mt-2"
               onClick={handleAddIngredient}
-              style={{ marginRight: "300px" }}
+              style={{ borderRadius: "8px", padding: "10px" }}
             >
               Add Ingredient
             </button>
             {ingredients.length > 0 && (
-              <ul className="list-group mt-3">
+              <ul className="list-group mt-3" style={{ paddingLeft: "0" }}>
                 {ingredients.map((item, index) => (
                   <li
                     key={index}
                     className="list-group-item d-flex justify-content-between align-items-center"
+                    style={{ borderRadius: "8px", marginBottom: "5px" }}
                   >
                     {item}
                     <button
                       type="button"
                       className="btn btn-danger btn-sm"
                       onClick={() => handleRemoveIngredient(index)}
+                      style={{ borderRadius: "50%", padding: "5px 10px" }}
                     >
-                      Remove
+                      &times;
                     </button>
                   </li>
                 ))}
@@ -273,10 +300,10 @@ export default function EditRecipe() {
                 required: "Instructions are required",
               })}
               onInput={handleTextareaChange}
-              style={{ overflow: "hidden" }}
+              style={{ borderRadius: "8px", padding: "15px", paddingTop: "30px", height: "100px" }}
             />
             <label htmlFor="instructions">Instructions</label>
-            {errors.instructions && <span>{errors.instructions.message}</span>}
+            {errors.instructions && <span style={{ color: "red" }}>{errors.instructions.message}</span>}
           </div>
           <div className="form-floating mb-3">
             <textarea
@@ -287,17 +314,17 @@ export default function EditRecipe() {
                 required: "Description is required",
               })}
               onInput={handleTextareaChange}
-              style={{ overflow: "hidden" }}
+              style={{ borderRadius: "8px", padding: "15px", paddingTop: "30px", height: "100px" }}
             />
             <label htmlFor="description">Description</label>
-            {errors.description && <span>{errors.description.message}</span>}
+            {errors.description && <span style={{ color: "red" }}>{errors.description.message}</span>}
           </div>
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ marginBottom: "50px" }}
+            style={{ width: "100%", padding: "10px", borderRadius: "8px" }}
           >
-            Edit
+            Edit Recipe
           </button>
         </div>
       </div>
