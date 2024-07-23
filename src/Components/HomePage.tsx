@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { IRecipe } from "./Recipe";
 import recipeService from "../Services/recipe-service";
 import RecipeRow from "./RecipeRow";
-import { Link } from "react-router-dom";
 import { CanceledError } from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
@@ -12,26 +11,14 @@ export default function HomePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [topFiveRecipes, setTopFiveRecipes] = useState<IRecipe[]>([]);
   const [randomRecipes, setRandomRecipes] = useState<IRecipe[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const { isLoading } = useAuth();
 
   useEffect(() => {
-    const { getCategories, cancelCategories } = recipeService.getCategories();
     const { topFive, cancelTopFive } = recipeService.getTopFive();
     const { randomRESTApi, cancelRandomRESTApi } =
       recipeService.getRandomRESTApi();
 
     const getData = async () => {
-      getCategories
-        .then((res) => {
-          setCategories(res.data);
-          console.log(res.data);
-        })
-        .catch((err) => {
-          if (err instanceof CanceledError) return;
-          console.log(err);
-        });
-
       topFive
         .then((res) => {
           setTopFiveRecipes(res.data);
@@ -57,7 +44,6 @@ export default function HomePage() {
       getData();
     
     return () => {
-      cancelCategories();
       cancelTopFive();
       cancelRandomRESTApi();
     };
@@ -83,41 +69,17 @@ export default function HomePage() {
   }
 
   return (
-    <div
-      style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
-    >
+    <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
       <div
         style={{
           display: "flex",
           flexDirection: "row",
           width: "100%",
           maxWidth: "1200px",
+          justifyContent: "center",
         }}
       >
         <div
-          className="btn-group"
-          style={{ marginRight: "20px", height: "10vh" }}
-        >
-          <button
-            type="button"
-            className="btn btn-primary dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Categories
-          </button>
-          <ul className="dropdown-menu">
-            {categories.map((category) => (
-              <li key={category}>
-                <Link className="dropdown-item" to={`/recipe/${category}`}>
-                  {category}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div
-        
           style={{
             flex: 1,
             padding: "20px",
@@ -125,11 +87,62 @@ export default function HomePage() {
             borderRadius: "8px",
           }}
         >
-          <h2>Your best recipes:</h2>
+          <h1
+            style={{
+              textAlign: "center",
+              fontSize: "48px",
+              marginTop: "30px",
+              marginBottom: "50px",
+              fontFamily: "'Dancing Script', cursive", // Unique font
+              letterSpacing: "2px",
+              color: "#333", // Adjust color if needed
+            }}
+          >
+            Welcome to YumMe!
+          </h1>
+          <p
+            style={{
+              textAlign: "center",
+              fontSize: "24px",
+              marginBottom: "50px",
+              fontFamily: "'Roboto', sans-serif", // Unique font for the body text
+              color: "#555", // Adjust color if needed
+            }}
+          >
+            Let’s Dive into Deliciousness<br /><br />
+            We’re excited to have you join our community of food enthusiasts! At YumMe, we're more than just a recipe hub—here you can share your culinary creations, get feedback from fellow foodies, and discover delicious recipes from our community. Whether you're here to upload your own masterpieces, explore dishes, or engage with other passionate cooks, YumMe is your go-to spot.
+            Dive into the fun, interact with others, and let’s make cooking a shared adventure. 
+            
+          </p>
+
+          <h2
+            style={{
+              textAlign: "center",
+              fontSize: "35",
+              fontFamily: "'Roboto', sans-serif",
+              letterSpacing: "2px",
+              fontWeight: "bold",
+            }}
+          >
+          Bon appétit! 🍽️
+          </h2>
+          <h2
+            style={{
+              textAlign: "center",
+              fontSize: "48px",
+              marginTop: "200px",
+              marginBottom: "50px",
+              fontFamily: "'Courier New', Courier, monospace",
+              letterSpacing: "2px",
+            }}
+          >
+            Your 5 best recipes:
+          </h2>
           <ul
             style={{
               display: "flex",
               flexWrap: "wrap",
+              justifyContent: "center",
               gap: "15px",
               listStyle: "none",
               padding: 0,
@@ -139,7 +152,8 @@ export default function HomePage() {
               <li
                 key={recipe._id}
                 style={{
-                  flex: "1 1 calc(33.333% - 10px)",
+                  width: "calc(33.333% - 20px)",
+                  height: "300px",
                   boxSizing: "border-box",
                 }}
               >
@@ -152,12 +166,24 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
-
-          <h2>Explore some of our Recipes!</h2>
+    
+          <h2
+            style={{
+              textAlign: "center",
+              fontSize: "48px",
+              marginTop: "50px",
+              marginBottom: "50px",
+              fontFamily: "'Courier New', Courier, monospace",
+              letterSpacing: "2px",
+            }}
+          >
+            Explore some of our Recipes!
+          </h2>
           <ul
             style={{
               display: "flex",
               flexWrap: "wrap",
+              justifyContent: "center",
               gap: "15px",
               listStyle: "none",
               padding: 0,
@@ -167,7 +193,8 @@ export default function HomePage() {
               <li
                 key={recipe._id}
                 style={{
-                  flex: "1 1 calc(33.333% - 10px)",
+                  width: "calc(33.333% - 20px)",
+                  height: "300px",
                   boxSizing: "border-box",
                 }}
               >
@@ -184,4 +211,4 @@ export default function HomePage() {
       </div>
     </div>
   );
-}
+}  
