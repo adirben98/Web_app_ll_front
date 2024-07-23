@@ -1,15 +1,16 @@
 import { useForm } from "react-hook-form";
-import registerService, {IUser} from "../Services/auth-service";
+import registerService, { IUser } from "../Services/auth-service";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-
+import { useEffect } from "react";
+import UserService from "../Services/user-service";
 
 export default function LoginForm() {
-
-
   function login() {
     console.log("login");
 
-   registerService.login(watch("email"), watch("password")!).then((data) => {
+    registerService
+      .login(watch("email"), watch("password")!)
+      .then((data) => {
         window.location.href = "/";
         console.log(data);
       })
@@ -29,8 +30,11 @@ export default function LoginForm() {
     registerService.googleLogin(credentials).then((data) => {
       window.location.href = "/";
       console.log(data);
-    })
+    });
   }
+  useEffect(() => {
+    if (UserService.getConnectedUser()) window.location.href = "/";
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(login)}>

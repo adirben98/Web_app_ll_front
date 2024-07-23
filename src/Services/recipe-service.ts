@@ -60,10 +60,10 @@ class RecipeService {
 
   getRecipe(id: string) {
     const controller = new AbortController();
-    const recipe = apiClient.get<IRecipe>(`/recipe/${id}`, {
+    const getRecipe = apiClient.get<IRecipe>(`/recipe/${id}`, {
       signal: controller.signal,
     });
-    return { recipe, cancelRecipe: () => controller.abort() };
+    return { getRecipe, cancelRecipe: () => controller.abort() };
   }
 
   createRecipe(recipe: IRecipe) {
@@ -72,7 +72,7 @@ class RecipeService {
 
   updateRecipe(recipe: IRecipe) {
     const controller = new AbortController();
-    const Recipe = apiClient.put(`/recipe/${recipe._id}`, recipe);
+    const Recipe = apiClient.put(`/recipe`, recipe);
     return { Recipe, cancelUpdate: () => controller.abort() };
   }
 
@@ -104,6 +104,10 @@ class RecipeService {
 
   unlike(id: string) {
     return apiClient.post(`/recipe/unlike/${id}`);
+  }
+
+  deleteRecipe(id: string) {
+    return apiClient.delete(`/recipe/${id}`);
   }
 }
 

@@ -68,7 +68,7 @@ export default function AddRecipe() {
       const newRecipe: IRecipe = {
         name: watch("name"),
         author: user.username!,
-        authorImg: user.userImg!,
+        authorImg: user.image!,
         category: category,
         ingredients: ingredients,
         instructions: watch("instructions"),

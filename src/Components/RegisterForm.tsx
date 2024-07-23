@@ -1,4 +1,4 @@
-import React, {  } from "react";
+import React, { useEffect } from "react";
 import avatar from "../assets/avatar.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
@@ -6,6 +6,7 @@ import uploadPhoto from "../Services/file-service";
 import {  useForm } from "react-hook-form";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import registerService, { IUser} from "../Services/auth-service";
+import UserService from "../Services/user-service";
 
 export default function RegisterForm() {
   const {
@@ -92,6 +93,10 @@ export default function RegisterForm() {
   const [image, setImage] = React.useState<File>();
 
   const photoGalleryRef = React.useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (UserService.getConnectedUser()) window.location.href = "/";
+
+  },[])
   return (
     <form onSubmit={handleSubmit(Register)}>
       {error && <span>{error}</span>}
