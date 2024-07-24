@@ -15,21 +15,21 @@
   
   .inputContainer {
     display: flex;
+    flex-direction: column;
     padding: 10px;
     border-top: 1px solid #ccc;
     background: #eee;
   }
   
   .inputContainer input {
-    flex: 1;
     padding: 10px;
+    margin-bottom: 5px;
     border: 1px solid #ddd;
     border-radius: 4px;
   }
   
   .inputContainer button {
     padding: 10px 15px;
-    margin-left: 10px;
     background: #007bff;
     color: #fff;
     border: none;
