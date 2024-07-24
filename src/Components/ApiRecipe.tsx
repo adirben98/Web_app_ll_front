@@ -25,10 +25,14 @@ export default function ApiRecipe() {
 
     getRecipeFromApi
       .then((res) => {
+        console.log(res.data);
+
         setRecipe(res.data);
       })
       .catch((err) => {
         if (err instanceof CanceledError) return;
+        window.location.href = '/404';
+
         console.log(err);
       });
 

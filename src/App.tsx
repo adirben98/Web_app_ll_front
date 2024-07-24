@@ -12,6 +12,8 @@ import Chat from './Components/Chat';
 import DefaultLayout from './Components/withBackground';
 import NoBackgroundLayout from './Components/withoutBackground';
 import ApiRecipe from './Components/ApiRecipe';
+import AllRecipes from './Components/AllRecipes';
+import ApiCategories from './Components/ApiCategories';
 
 
 function App() {
@@ -25,8 +27,11 @@ function App() {
       </Route>
       <Route element={<DefaultLayout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/recipeFromApi/:name" element={<ApiRecipe />} />
         <Route path="/search" element={<SearchPage />} />
-        <Route path="/searchFromApi" element={<SearchPage />} />
+        <Route path="/allRecipes" element={<AllRecipes />} />
+        <Route path="/apiCategories" element={<ApiCategories />} />
+        <Route path="/categoryFromApi" element={<SearchPage />} />
         <Route path="/profile/:name" element={<ProfilePage />} />
         <Route path="/addRecipe" element={<AddRecipe />} />
         <Route path="/recipe/:id" element={<Recipe />} />

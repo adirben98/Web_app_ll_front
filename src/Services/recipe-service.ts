@@ -51,7 +51,7 @@ class RecipeService {
 
   searchCategory(category: string) {
     const controller = new AbortController();
-    const results = apiClient.get<ICategory[]>(
+    const results = apiClient.get<IRecipe[]>(
       `/recipe/categorySearch/${category}`,
       { signal: controller.signal }
     );
