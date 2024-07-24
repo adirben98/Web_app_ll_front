@@ -41,8 +41,8 @@ export default function HomePage() {
       setLoading(isLoading);
     };
 
-      getData();
-    
+    getData();
+
     return () => {
       cancelTopFive();
       cancelRandomRESTApi();
@@ -69,7 +69,9 @@ export default function HomePage() {
   }
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+    <div
+      style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+    >
       <div
         style={{
           display: "flex",
@@ -109,10 +111,16 @@ export default function HomePage() {
               color: "#555", // Adjust color if needed
             }}
           >
-            Let’s Dive into Deliciousness<br /><br />
-            We’re excited to have you join our community of food enthusiasts! At YumMe, we're more than just a recipe hub—here you can share your culinary creations, get feedback from fellow foodies, and discover delicious recipes from our community. Whether you're here to upload your own masterpieces, explore dishes, or engage with other passionate cooks, YumMe is your go-to spot.
-            Dive into the fun, interact with others, and let’s make cooking a shared adventure. 
-            
+            Let’s Dive into Deliciousness
+            <br />
+            <br />
+            We’re excited to have you join our community of food enthusiasts! At
+            YumMe, we're more than just a recipe hub—here you can share your
+            culinary creations, get feedback from fellow foodies, and discover
+            delicious recipes from our community. Whether you're here to upload
+            your own masterpieces, explore dishes, or engage with other
+            passionate cooks, YumMe is your go-to spot. Dive into the fun,
+            interact with others, and let’s make cooking a shared adventure.
           </p>
 
           <h2
@@ -124,7 +132,7 @@ export default function HomePage() {
               fontWeight: "bold",
             }}
           >
-          Bon appétit! 🍽️
+            Bon appétit! 🍽️
           </h2>
           <h2
             style={{
@@ -158,15 +166,15 @@ export default function HomePage() {
                 }}
               >
                 <RecipeRow
+                  url={`/recipe/${recipe._id!}`}
                   recipeImg={recipe.image}
-                  id={recipe._id!}
                   description={recipe.description}
                   recipeName={recipe.name}
                 />
               </li>
             ))}
           </ul>
-    
+
           <h2
             style={{
               textAlign: "center",
@@ -200,7 +208,7 @@ export default function HomePage() {
               >
                 <RecipeRow
                   recipeImg={recipe.image}
-                  id={recipe._id!}
+                  url={`/recipeFromApi/${recipe.name!}`}
                   description={recipe.description}
                   recipeName={recipe.name}
                 />
@@ -211,4 +219,4 @@ export default function HomePage() {
       </div>
     </div>
   );
-}  
+}

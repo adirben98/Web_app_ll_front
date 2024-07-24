@@ -11,6 +11,7 @@ import HomePage from './Components/HomePage';
 import Chat from './Components/Chat';
 import AllRecipes from './Components/AllRecipes';
 import ApiCategories from './Components/ApiCategories';
+import ApiRecipe from './Components/ApiRecipe';
 
 
 function App() {
@@ -21,9 +22,9 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/allRecipes" element={<AllRecipes />} />
       <Route path="/categoryFromApi" element={<SearchPage />} />
-
-      <Route path="/search" element={<SearchPage  />} />
       <Route path="/categoriesFromApi" element={<ApiCategories/>} />
+      <Route path="/recipeFromApi/:name" element={<ApiRecipe />} />
+      <Route path="/search" element={<SearchPage  />} />
       <Route path="/profile/:name" element={<ProfilePage />} />
       <Route path="/addRecipe" element={<AddRecipe />} />
       <Route path="/recipe/:id" element={<Recipe />} />

@@ -100,7 +100,7 @@ export default function SearchPage() {
                   >
                     <RecipeRow
                       recipeImg={recipe.image}
-                      id={recipe._id!}
+                      url={`/recipe/${recipe._id}`}
                       description={recipe.description}
                       recipeName={recipe.name}
                     />
