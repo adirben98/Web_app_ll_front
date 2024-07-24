@@ -7,7 +7,6 @@ import LoginForm from './Components/LoginForm';
 import AddRecipe from './Components/AddRecipe';
 import NotFound from './Components/NotFound';
 import SearchPage from './Components/SearchPage';
-import CategoryPage from './Components/CategoryPage';
 import HomePage from './Components/HomePage';
 import Chat from './Components/Chat';
 import AllRecipes from './Components/AllRecipes';
@@ -25,7 +24,6 @@ function App() {
 
       <Route path="/search" element={<SearchPage  />} />
       <Route path="/categoriesFromApi" element={<ApiCategories/>} />
-      <Route path="/category/:name" element={<CategoryPage />} />
       <Route path="/profile/:name" element={<ProfilePage />} />
       <Route path="/addRecipe" element={<AddRecipe />} />
       <Route path="/recipe/:id" element={<Recipe />} />
