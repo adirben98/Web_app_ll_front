@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import registerService, { IUser } from "../Services/auth-service";
 import backgroundImage from "../assets/background.png";
-import UserService from "../Services/user-service";
 
 export default function RegisterForm() {
   const {
@@ -28,7 +27,7 @@ export default function RegisterForm() {
           console.log(error);
           return;
         });
-    else url = avatar;
+    else url = "../assets/background.png";
 
     const user: IUser = {
       email: watch("email"),
@@ -103,7 +102,7 @@ export default function RegisterForm() {
 
   const photoGalleryRef = React.useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (UserService.getConnectedUser()) window.location.href = "/";
+    // if (UserService.getConnectedUser()) window.location.href = "/";
   }, []);
   return (
     

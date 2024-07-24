@@ -6,10 +6,12 @@ class userService {
     const username = localStorage.getItem("username");
 
     const email = localStorage.getItem("email");
-    const userImg = localStorage.getItem("imgUrl");
+    let userImg = localStorage.getItem("imgUrl");
+    if(!userImg)userImg= "../assets/avatar.png";
+
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
-    if (!username || !email || !userImg || !accessToken || !refreshToken) {return null}
+    if (!username || !email  || !accessToken || !refreshToken) {return null}
 
     const user: IUser = {
       username: username!,
