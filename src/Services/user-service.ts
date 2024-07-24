@@ -4,10 +4,12 @@ import { IUser } from "./auth-service";
 class userService {
   getConnectedUser() {
     const username = localStorage.getItem("username");
+
     const email = localStorage.getItem("email");
     const userImg = localStorage.getItem("imgUrl");
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
+    if (!username || !email || !userImg || !accessToken || !refreshToken) {return null}
 
     const user: IUser = {
       username: username!,
@@ -27,6 +29,14 @@ class userService {
 
   updateUserImage(image: string){
     return apiClient.put(`/auth/updateUserImage`, {imgUrl:image});
+  }
+
+  logout(){
+    localStorage.removeItem("email");
+    localStorage.removeItem("username");
+    localStorage.removeItem("imgUrl");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   }
 }
 

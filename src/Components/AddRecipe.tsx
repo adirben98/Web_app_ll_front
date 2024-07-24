@@ -55,7 +55,7 @@ export default function AddRecipe() {
     return true;
   }
 
-  const user = User.getConnectedUser();
+  const user = User.getConnectedUser()!;
 
   async function onSubmit() {
     console.log(ingredients);

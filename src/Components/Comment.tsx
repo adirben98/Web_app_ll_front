@@ -126,7 +126,7 @@ const Comment: React.FC<IComment> = ({
           {edited && (
             <span style={{ fontSize: "0.8em", color: "#999" }}>Edited</span>
           )}
-          {userService.getConnectedUser().username === author && (
+          {userService.getConnectedUser()!.username === author && (
             <div>
              <button
                 type="button"
