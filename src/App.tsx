@@ -10,7 +10,8 @@ import SearchPage from './Components/SearchPage';
 import CategoryPage from './Components/CategoryPage';
 import HomePage from './Components/HomePage';
 import Chat from './Components/Chat';
-import recipeService from './Services/recipe-service';
+import AllRecipes from './Components/AllRecipes';
+import ApiCategories from './Components/ApiCategories';
 
 
 function App() {
@@ -19,9 +20,11 @@ function App() {
   return (<>
     <Routes>
       <Route path="/" element={<HomePage />} />
-      
-      <Route path="/search" element={<SearchPage searchFunction={recipeService.searchRecipes} />} />
-      <Route path="/searchFromApi" element={<SearchPage searchFunction={recipeService.searchFromApi} />} />
+      <Route path="/allRecipes" element={<AllRecipes />} />
+      <Route path="/categoryFromApi" element={<SearchPage />} />
+
+      <Route path="/search" element={<SearchPage  />} />
+      <Route path="/categoriesFromApi" element={<ApiCategories/>} />
       <Route path="/category/:name" element={<CategoryPage />} />
       <Route path="/profile/:name" element={<ProfilePage />} />
       <Route path="/addRecipe" element={<AddRecipe />} />

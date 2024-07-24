@@ -100,7 +100,7 @@ export default function AddRecipe() {
         .then((Categories) => {
           const arr = [];
           for (let i = 0; i < Categories.data.length; i++) {
-            arr.push({ value: Categories.data[i], label: Categories.data[i] });
+            arr.push({ value: Categories.data[i].name, label: Categories.data[i].name });
           }
           setOptions(arr);
         })
