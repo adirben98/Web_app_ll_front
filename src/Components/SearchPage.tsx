@@ -4,14 +4,13 @@ import useAuth, { CanceledError } from "../Services/useAuth";
 import RecipeRow from "./RecipeRow";
 import { IRecipe } from "./Recipe";
 import recipeService from "../Services/recipe-service";
-import { ICategory } from "./ApiCategories";
-import CategoryRow from "./CategoryRow";
+
 
 export default function SearchPage() {
   const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true);
   const [searchResults, setSearchResults] = useState<IRecipe[]>([]);
-  const [categoriesResults, setCategoriesResults] = useState<ICategory[]>([]);
+  const [categoriesResults, setCategoriesResults] = useState<IRecipe[]>([]);
   const params = new URLSearchParams(location.search);
   const queryParam = params.get("q");
   const func = params.get("f");
@@ -106,15 +105,20 @@ export default function SearchPage() {
                     />
                   </div>
                 ))
-              : categoriesResults.map((category) => (
+              : categoriesResults.map((recipe) => (
                   <div
-                    key={category.name}
+                    key={recipe.name}
                     style={{
                       flex: "1 1 calc(33.333% - 10px)",
                       boxSizing: "border-box",
                     }}
                   >
-                    <CategoryRow name={category.name} image={category.image}  />
+                  <RecipeRow
+                  recipeImg={recipe.image}
+                  url={`/recipeFromApi/${recipe.name!}`}
+                  description={recipe.description}
+                  recipeName={recipe.name}
+                />  
                   </div>
                 ))}
           </div>
