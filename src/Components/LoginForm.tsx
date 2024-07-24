@@ -35,7 +35,7 @@ export default function LoginForm() {
     });
   }
   useEffect(() => {
-    //if (UserService.getConnectedUser()) window.location.href = "/";
+    if (UserService.getConnectedUser()) window.location.href = "/";
   }, []);
 
   return (
