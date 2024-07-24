@@ -215,7 +215,7 @@ export default function AddRecipe() {
               ref={selectRef}
               style={{ borderRadius: "8px", padding: "10px" }}
             >
-              <option value="">Select Category</option>
+              <option  value="">Select Category</option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}

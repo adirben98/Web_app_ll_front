@@ -329,5 +329,5 @@ export default function EditRecipe() {
         </div>
       </div>
     </form>
-  );
+);
 }
