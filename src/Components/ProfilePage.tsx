@@ -253,7 +253,7 @@ export default function ProfilePage() {
                     style={{ flex: "1 1 calc(33.333% - 10px)" }}
                   >
                     <RecipeRow
-                      id={recipe._id!}
+                      url={`/recipe/${recipe._id!}`}
                       recipeImg={recipe.image}
                       recipeName={recipe.name}
                       description={recipe.description}
@@ -273,7 +273,7 @@ export default function ProfilePage() {
                     style={{ flex: "1 1 calc(33.333% - 10px)" }}
                   >
                     <RecipeRow
-                      id={recipe._id!}
+                      url={`/recipe/${recipe._id!}`}
                       recipeImg={recipe.image}
                       recipeName={recipe.name}
                       description={recipe.description}

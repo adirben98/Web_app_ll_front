@@ -118,6 +118,14 @@ class RecipeService {
   deleteRecipe(id: string) {
     return apiClient.delete(`/recipe/${id}`);
   }
+
+  getRecipeFromApi(name: string) {
+    const controller = new AbortController();
+    const getRecipeFromApi = apiClient.get<IRecipe>(`/recipe/recipeFromApi/${name}`, {
+      signal: controller.signal,
+    });
+    return { getRecipeFromApi, cancelRecipeFromApi: () => controller.abort() };
+  }
 }
 
 export default new RecipeService();
