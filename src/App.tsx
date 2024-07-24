@@ -11,6 +11,7 @@ import HomePage from './Components/HomePage';
 import Chat from './Components/Chat';
 import DefaultLayout from './Components/withBackground';
 import NoBackgroundLayout from './Components/withoutBackground';
+import ApiRecipe from './Components/ApiRecipe';
 
 
 function App() {
