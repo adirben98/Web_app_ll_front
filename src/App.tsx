@@ -8,7 +8,7 @@ import AddRecipe from './Components/AddRecipe';
 import NotFound from './Components/NotFound';
 import SearchPage from './Components/SearchPage';
 import HomePage from './Components/HomePage';
-import Chat from './Components/Chat';
+//import Chat from './Components/Chat';
 import NoBackgroundLayout from './Components/withoutBackground';
 import ApiRecipe from './Components/ApiRecipe';
 import AllRecipes from './Components/AllRecipes';
@@ -37,7 +37,7 @@ function App() {
         <Route path="/addRecipe" element={<AddRecipe />} />
         <Route path="/recipe/:id" element={<Recipe />} />
         <Route path="/editRecipe/:id" element={<EditRecipe />} />
-        <Route path="/chat" element={<Chat />} />
+        {/* <Route path="/chat" element={<Chat />} /> */}
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
