@@ -2,23 +2,16 @@ import { useState, ChangeEvent, FormEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch";
-import { AxiosResponse, CanceledError } from "axios";
-import { IRecipe } from "./Recipe";
 
-interface SearchResult {
+import recipeService from "../Services/recipe-service";
+
+interface SearchResults{
   id: string;
   name: string;
 }
-interface SearchPageProps {
-  url: string;
-  searchFunction: (query: string) => {
-    results: Promise<AxiosResponse<IRecipe[], unknown>>;
-    cancelSearch: () => void;
-  };
-}
 
-export default function SearchBar({ url, searchFunction }: SearchPageProps) {
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+export default function SearchBar() {
+  const [searchResults, setSearchResults] = useState<SearchResults[]>([]);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const navigate = useNavigate();
   const ref = useRef<HTMLInputElement>(null);
@@ -33,20 +26,21 @@ export default function SearchBar({ url, searchFunction }: SearchPageProps) {
       return;
     }
 
-    const { results } = searchFunction(query);
+    const { results } = recipeService.searchRecipes(query);
 
     try {
       console.log("starting");
-      const response = await results;
-      console.log(response.data);
-      const recipes = response.data.map((recipe) => ({
-        id: recipe._id!,
-        name: recipe.name,
-      }));
-      setSearchResults(recipes);
-      setShowDropdown(true);
+      results.then((response) => {
+        console.log(response.data);
+        const recipes = response.data.map((recipe) => ({
+          id: recipe._id!,
+          name: recipe.name,
+        }));
+        setSearchResults(recipes);
+        setShowDropdown(true);
+      }).catch((err) => console.log(err));
+      
     } catch (error) {
-      if (error instanceof CanceledError) return;
       console.log(error);
     }
   }
@@ -56,14 +50,17 @@ export default function SearchBar({ url, searchFunction }: SearchPageProps) {
     const query = ref.current?.value;
 
     if (!query) return;
-    console.log(`/${url}?q=${query}`);
+    ref.current!.value = "";
+
     setShowDropdown(false);
-    navigate(`${url}?q=${query}`);
+    navigate(`/search?q=${query}&f=search`);
   }
 
   const handleItemClick = (id: string) => {
     ref.current!.value = "";
     navigate(`/recipe/${id}`);
+    setShowDropdown(false);
+
   };
 
   return (
@@ -80,9 +77,8 @@ export default function SearchBar({ url, searchFunction }: SearchPageProps) {
           placeholder="Search"
           aria-label="Search"
           onChange={handleInputChange}
-          style={{ flex: 1 }}
         />
-        <button type="submit" className="btn" style={{ marginRight: "10px" }}>
+        <button type="submit" className="btn">
           <FontAwesomeIcon icon={faSearch} className="fa-xl tinted-icon" />
         </button>
       </form>

@@ -9,11 +9,11 @@ import NotFound from './Components/NotFound';
 import SearchPage from './Components/SearchPage';
 import HomePage from './Components/HomePage';
 import Chat from './Components/Chat';
-import DefaultLayout from './Components/withBackground';
 import NoBackgroundLayout from './Components/withoutBackground';
 import ApiRecipe from './Components/ApiRecipe';
 import AllRecipes from './Components/AllRecipes';
 import ApiCategories from './Components/ApiCategories';
+import HeaderLayout from './Components/HeaderLayout';
 
 
 function App() {
@@ -25,7 +25,8 @@ function App() {
       <Route path="/login" element={<NoBackgroundLayout />}>
         <Route index element={<LoginForm />} />
       </Route>
-      <Route element={<DefaultLayout />}>
+      <Route element={<HeaderLayout />}>
+
         <Route path="/" element={<HomePage />} />
         <Route path="/recipeFromApi/:name" element={<ApiRecipe />} />
         <Route path="/search" element={<SearchPage />} />

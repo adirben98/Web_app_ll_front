@@ -52,6 +52,11 @@ export default function AddRecipe() {
       setError("category", { message: "Category is required" });
       return false;
     }
+    
+    else if (image === undefined) {
+      setError("image", { message: "Image is required" });
+      return false;
+    }
     return true;
   }
 
@@ -176,6 +181,8 @@ export default function AddRecipe() {
               }}
               alt="Recipe"
             />
+            {errors.image && <span style={{ color: "red" }}>{errors.image.message}</span>}
+
           </div>
           <div style={{ marginBottom: "20px", textAlign: "center" }}>
             <button type="button" className="btn btn-outline-secondary" onClick={handleClick} style={{ borderRadius: "50%", padding: "10px" }}>

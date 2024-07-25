@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import registerService, { IUser } from "../Services/auth-service";
 import backgroundImage from "../assets/background.png";
+import userService from "../Services/user-service";
 
 export default function RegisterForm() {
   const {
@@ -20,14 +21,12 @@ export default function RegisterForm() {
 
   async function Register() {
     let url = "";
-    if (image)
-      uploadPhoto(image!)
-        .then((res) => (url = res))
-        .catch((error) => {
-          console.log(error);
-          return;
-        });
-    else url = "../assets/background.png";
+    try{
+    if (image) {
+      url = await uploadPhoto(image);
+    }}catch(e){
+      console.log(e);
+    }
 
     const user: IUser = {
       email: watch("email"),
@@ -35,6 +34,7 @@ export default function RegisterForm() {
       username: watch("username"),
       password: watch("password"),
     };
+    console.log(url);
 
     registerService
       .registrUser(user)
@@ -102,10 +102,9 @@ export default function RegisterForm() {
 
   const photoGalleryRef = React.useRef<HTMLInputElement>(null);
   useEffect(() => {
-    // if (UserService.getConnectedUser()) window.location.href = "/";
+     if (userService.getConnectedUser()) window.location.href = "/";
   }, []);
   return (
-    
     <div
       style={{
         display: "flex",
@@ -123,12 +122,12 @@ export default function RegisterForm() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          backgroundColor: "rgba(255, 255, 255, 0.9)", 
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
           borderRadius: "10px",
           boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-          width: "400px", 
+          width: "400px",
           padding: "20px",
-          height: "auto", 
+          height: "auto",
         }}
       >
         <h1
@@ -136,7 +135,7 @@ export default function RegisterForm() {
             fontFamily: "'Courier New', Courier, monospace",
             fontWeight: "bold",
             padding: "30px",
-            fontSize: "2rem", 
+            fontSize: "2rem",
             marginBottom: "20px",
             textAlign: "center",
           }}
@@ -149,7 +148,7 @@ export default function RegisterForm() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: "100%", 
+            width: "100%",
           }}
         >
           {error && <span>{error}</span>}

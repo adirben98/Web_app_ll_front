@@ -19,7 +19,7 @@ export default function EditProfile({ afterEdit }: IPassword) {
   async function onSubmit(data: IPassword) {
       const oldPassword = watch("oldPassword");
       const newPassword = watch("newPassword");
-      const username = userService.getConnectedUser().username;
+      const username = userService.getConnectedUser()!.username;
 
       authService
         .changePassword({
