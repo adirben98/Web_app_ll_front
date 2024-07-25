@@ -4,7 +4,7 @@ import axios, { CanceledError } from "axios";
 export { CanceledError };
 
 export const apiClient = axios.create({
-  baseURL: "https://193.106.55.166:80",
+  baseURL: "https://10.10.248.100:80",
   headers: {Authorization : `Bearer ${localStorage.getItem("accessToken")}`},
 });
 
