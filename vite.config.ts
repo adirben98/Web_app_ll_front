@@ -7,7 +7,7 @@ export default defineConfig({
   
   plugins: [react()],
   server: {
-    host:'10.10.248.166',
+    host:'193.106.55.166',
     https: {
       key: fs.readFileSync("../client-key.pem"),
       cert: fs.readFileSync("../client-cert.pem"),
