@@ -10,11 +10,12 @@ export default function Header() {
   // const [categories, setCategories] = useState<string[]>([]);
   // const { getCategories, cancelCategories } = recipeService.getCategories();
   // const { isLoading } = useAuth();
-  const [image, setImage] = useState<string |undefined>(undefined);
-
+  const [image, setImage] = useState<string>(avatar); 
   useEffect(() => {
-    setImage(userService.getConnectedUser()!.image||avatar);
-    console.log(userService.getConnectedUser()!.image);
+    const user = userService.getConnectedUser();
+    if (user) setImage(user.image);
+    
+  
     // getCategories.then((res) => {
     //   console.log(res.data);
     //   setCategories(res.data);
