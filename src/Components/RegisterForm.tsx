@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import registerService, { IUser } from "../Services/auth-service";
 import backgroundImage from "../assets/background.png";
+import userService from "../Services/user-service";
 
 export default function RegisterForm() {
   const {
@@ -20,16 +21,12 @@ export default function RegisterForm() {
   const [image, setImage] = React.useState<File | null>(null);
 
   async function Register() {
-    let url = avatar; // Default to avatar
-
+    let url = "";
+    try{
     if (image) {
-      try {
-        url = await uploadPhoto(image); // Await the result of the photo upload
-      } catch (uploadError) {
-        console.error(uploadError);
-        // Optionally, you can handle the upload error here, maybe fallback to avatar
-        url = avatar;
-      }
+      url = await uploadPhoto(image);
+    }}catch(e){
+      console.log(e);
     }
 
     const user: IUser = {
@@ -38,6 +35,7 @@ export default function RegisterForm() {
       username: watch("username"),
       password: watch("password"),
     };
+    console.log(url);
 
     registerService
       .registrUser(user)
@@ -106,7 +104,7 @@ export default function RegisterForm() {
   const photoGalleryRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // if (UserService.getConnectedUser()) window.location.href = "/";
+     if (userService.getConnectedUser()) window.location.href = "/";
   }, []);
 
   return (

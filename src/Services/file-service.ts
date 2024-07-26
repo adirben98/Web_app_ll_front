@@ -13,7 +13,7 @@ const uploadPhoto = async (photo:File) =>{
       }
     
     }).then((response)=>{
-        console.log(response);
+
         resolve(response.data.url);
       }).catch((error)=>{
         console.log(error)

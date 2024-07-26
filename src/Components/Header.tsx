@@ -5,25 +5,28 @@ import useAuth from "../Services/useAuth";
 import yumMe from "../assets/yumMeLogo1.png";
 import avatar from "../assets/avatar.png";
 import userService from "../Services/user-service";
+import { ICategory } from "./ApiCategories";
 
 export default function Header() {
-  // const [categories, setCategories] = useState<string[]>([]);
-  // const { getCategories, cancelCategories } = recipeService.getCategories();
-  // const { isLoading } = useAuth();
-  const [image, setImage] = useState<string>(avatar); 
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const { getCategories, cancelCategories } = recipeService.getCategories();
+  const { isLoading } = useAuth();
+  const [image, setImage] = useState<string>(avatar);
+  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+
   useEffect(() => {
-    const user = userService.getConnectedUser();
-    if (user) setImage(user.image);
-    
-  
-    // getCategories.then((res) => {
-    //   console.log(res.data);
-    //   setCategories(res.data);
-    // });
-    // return () => {
-    //   cancelCategories();
-    // };
-  }, []);
+    const userImg = userService.getConnectedUser()!.image;
+    if (userImg !== "") setImage(userImg);
+    console.log(userService.getConnectedUser()!.image);
+    getCategories.then((res) => {
+      console.log(res.data);
+      setCategories(res.data);
+    });
+    return () => {
+      cancelCategories();
+    };
+  }, [isLoading]);
+
   return (
     <nav
       className="navbar navbar-expand-lg navbar-light bg-light fixed-top"
@@ -31,10 +34,14 @@ export default function Header() {
     >
       <div
         className="container-fluid"
-        style={{ width: "100%", padding: "0", height: `50px` }}
+        style={{ width: "100%", padding: "0", height: "50px" }}
       >
         <a className="navbar-brand" href="/" style={{ padding: "0" }}>
-          <img src={yumMe} style={{ width: "120px", height: "120px" }} />
+          <img
+            src={yumMe}
+            style={{ width: "120px", height: "120px" }}
+            alt="YumMe!"
+          />
         </a>
         <button
           className="navbar-toggler"
@@ -53,71 +60,84 @@ export default function Header() {
         >
           <ul className="navbar-nav mt-2 mt-lg-0" style={{ gap: "2rem" }}>
             <li className="nav-item active">
-              <a className="nav-link" href="#" style={{ fontSize: "1.5rem" }}>
+              <a className="nav-link" href="/" style={{ fontSize: "1.5rem" }}>
                 Home <span className="sr-only">(current)</span>
               </a>
             </li>
-            <li className="nav-item dropdown">
+            <li
+              className="nav-item dropdown"
+              onMouseEnter={() => setDropdownVisible(true)}
+              onMouseLeave={() => setDropdownVisible(false)}
+              style={{ position: "relative" }}
+            >
               <a
                 className="nav-link dropdown-toggle"
-                href="#"
+                href="/apiCategories"
                 id="navbarDropdown"
                 role="button"
-                data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
                 style={{ fontSize: "1.5rem" }}
               >
                 Categories
               </a>
-              <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a className="dropdown-item" href="#">
-                  Category 1
-                </a>
-                <a className="dropdown-item" href="#">
-                  Category 2
-                </a>
-                <div className="dropdown-divider"></div>
-                <a className="dropdown-item" href="#">
-                  Category 3
-                </a>
-              </div>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#" style={{ fontSize: "1.5rem" }}>
-                All Recipes
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#" style={{ fontSize: "1.5rem" }}>
-                Add Recipe
-              </a>
-            </li>
-            <li className="nav-item">
               <div
+                className="dropdown-menu"
+                aria-labelledby="navbarDropdown"
                 style={{
-                  marginLeft: "auto",
-                  display: "flex",
-                  alignItems: "center",
+                  display: dropdownVisible ? "block" : "none",
+                  position: "absolute",
+                  backgroundColor: "#ffffff",
+                  boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.15)",
+                  zIndex: 1000,
                 }}
               >
-                <SearchBar
-                  url="/search"
-                  searchFunction={recipeService.searchRecipes}
-                />
+                {categories.map((category) => (
+                  <a
+                    key={category.name}
+                    className="dropdown-item"
+                    href={`/categoryFromApi?q=${category.name}&f=category`}
+                  >
+                    {category.name}
+                  </a>
+                ))}
               </div>
             </li>
             <li className="nav-item">
               <a
                 className="nav-link"
-                href="#"
+                href="/allRecipes"
+                style={{ fontSize: "1.5rem" }}
+              >
+                All Recipes
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                className="nav-link"
+                href="/addRecipe"
+                style={{ fontSize: "1.5rem" }}
+              >
+                Add Recipe
+              </a>
+            </li>
+            <li
+              className="nav-item"
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <SearchBar />
+            </li>
+            <li className="nav-item">
+              <a
+                className="nav-link"
+                href={`/profile/${userService.getConnectedUser()!.username}`}
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <img
                   src={image}
-                  width="40"
-                  height="40"
-                  className="d-inline-block align-top"
+                  className="img-fluid avatar-xxl rounded-circle"
+                  alt="Profile"
+                  style={{ width: "40px", height: "40px" }}
                 />
               </a>
             </li>
