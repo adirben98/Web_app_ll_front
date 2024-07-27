@@ -30,6 +30,7 @@ class userService {
   }
 
   updateUserImage(image: string){
+    localStorage.setItem("imgUrl", image);
     return apiClient.put(`/auth/updateUserImage`, {imgUrl:image});
   }
 
