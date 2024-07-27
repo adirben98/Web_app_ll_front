@@ -75,11 +75,14 @@ export default function Recipe() {
       console.log(error);
     }
     const user=userService.getConnectedUser()!;
-    if(user.username===recipe.author){
-      setIsTheAuthor(true);
-    }
+    
     getRecipe
-      .then((recipe) => setRecipe(recipe.data))
+      .then((recipe) => {
+        setRecipe(recipe.data)
+        if(user.username===recipe.data.author){
+          setIsTheAuthor(true);
+        }
+      })
       .catch((error) => {
         errorHandler(error);
     });
