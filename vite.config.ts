@@ -7,7 +7,7 @@ export default defineConfig({
   
   plugins: [react()],
   server: {
-    host:'10.10.248.166',
+    host:'node06.cs.colman.ac.il',
     https: {
       key: fs.readFileSync("../client-key.pem"),
       cert: fs.readFileSync("../client-cert.pem"),
