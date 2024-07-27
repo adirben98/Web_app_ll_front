@@ -1,5 +1,6 @@
 import { CredentialResponse } from "@react-oauth/google";
 import {apiClient} from "./useAuth";
+import avatar from "../assets/avatar.png";
 
 
 export interface IUser {

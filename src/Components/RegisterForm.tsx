@@ -17,7 +17,8 @@ export default function RegisterForm() {
     setError,
     watch,
   } = useForm<IUser>();
-  const [error, seterror] = React.useState<string>("");
+  const [error, setErrorState] = React.useState<string>("");
+  const [image, setImage] = React.useState<File | null>(null);
 
   async function Register() {
     let url = "";
@@ -82,6 +83,7 @@ export default function RegisterForm() {
         console.log(error);
       });
   }
+
   async function onSuccess(response: CredentialResponse) {
     registerService
       .googleLogin(response)
@@ -93,17 +95,18 @@ export default function RegisterForm() {
         console.log(error);
       });
   }
+
   function onError() {
-    seterror("Error login from google");
+    setErrorState("Error logging in with Google");
     console.log();
   }
 
-  const [image, setImage] = React.useState<File>();
-
   const photoGalleryRef = React.useRef<HTMLInputElement>(null);
+
   useEffect(() => {
      if (userService.getConnectedUser()) window.location.href = "/";
   }, []);
+
   return (
     <div
       style={{
