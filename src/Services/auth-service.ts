@@ -31,6 +31,7 @@ class registerService {
 
   registrUser = (user: IUser) => {
     return new Promise<IUser>((resolve, reject) => {
+      if(user.image === "") user.image = avatar;
       apiClient
         .post("/auth/register", user)
         .then((response) => {
