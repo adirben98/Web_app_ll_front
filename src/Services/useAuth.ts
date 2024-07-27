@@ -33,7 +33,7 @@ const useAuth = () => {
     if (accessToken) {
       try {
         await axios.post(
-          "http://localhost:3000/auth/checkToken",
+          "https://193.106.55.166:80/auth/checkToken",
           {},
           {
             headers: { Authorization: `Bearer ${accessToken}` },
@@ -50,7 +50,7 @@ const useAuth = () => {
           if (refreshToken) {
             try {
               const response = await axios.get(
-                "http://localhost:3000/auth/refresh",
+                "https://193.106.55.166:80/auth/refresh",
                 {
                   headers: { Authorization: `Bearer ${refreshToken}` },
                   signal: controller.signal,
