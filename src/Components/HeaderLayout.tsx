@@ -5,12 +5,12 @@ import Background from './Background';
 const HeaderLayout = () => {
   return (
     <div>
-    <Background>
-        
       <Header />
-      <Outlet />
-    </Background>
-
+      <div style={{ marginTop: "100px" }}>
+        <Background>
+          <Outlet />
+        </Background>
+      </div>
     </div>
   );
 };

@@ -27,14 +27,15 @@ export default function Header() {
     };
   }, [isLoading]);
 
+ 
   return (
     <nav
       className="navbar navbar-expand-lg navbar-light bg-light fixed-top"
-      style={{ fontSize: "1.5rem", padding: "2rem 2.5rem" }}
+      style={{ fontSize: "1.5rem", padding: "2rem 2.5rem", height: "100px" }}
     >
       <div
         className="container-fluid"
-        style={{ width: "100%", padding: "0", height: "50px" }}
+        style={{ width: "100%", padding: "0" }}
       >
         <a className="navbar-brand" href="/" style={{ padding: "0" }}>
           <img

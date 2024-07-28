@@ -70,7 +70,7 @@ export default function HomePage() {
 
   return (
     <div
-      style={{ display: "flex", justifyContent: "center", marginTop: "70px" ,background: "#fff"}}
+      style={{ display: "flex", justifyContent: "center" ,background: "#fff"}}
     >
       <div
         style={{

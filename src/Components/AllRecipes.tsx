@@ -41,7 +41,7 @@ export default function AllRecipes() {
   }
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", marginTop:"70px" }}>
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h1>All Recipes</h1>
       <ul
         style={{

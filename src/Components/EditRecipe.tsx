@@ -181,7 +181,7 @@ export default function EditRecipe() {
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           padding: "20px",
           margin: "0 auto",
-          maxWidth: "1000px"  // Optional: Set a maxWidth if you want to limit the maximum width
+          maxWidth: "1000px" 
         }}>
           <h1 style={{ marginBottom: "20px", fontSize: "24px", fontWeight: "600", color: "#333" }}>Edit Recipe</h1>
           <div style={{ marginBottom: "20px", textAlign: "center" }}>
