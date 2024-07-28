@@ -50,14 +50,18 @@ export default function AllRecipes() {
           gap: "15px",
           listStyle: "none",
           padding: 0,
+          margin: 0,
         }}
       >
         {recipes.map((recipe) => (
           <li
             key={recipe._id}
             style={{
-              flex: "1 1 calc(33.333% - 10px)",
+              flex: "1 1 calc(33.333% - 15px)",
               boxSizing: "border-box",
+              minWidth: "10px", 
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <RecipeRow
