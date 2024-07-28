@@ -11,6 +11,8 @@ import { IUser } from "../Services/auth-service";
 import avatar from "../assets/avatar.png";
 import userService from "../Services/user-service";
 import recipeService from "../Services/recipe-service";
+import { useNavigate } from 'react-router-dom';
+
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<string>("myRecipes");
@@ -32,6 +34,8 @@ export default function ProfilePage() {
   const photoGalleryRef = useRef<HTMLInputElement>(null);
   const { isLoading } = useAuth();
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
+
+  const navigate = useNavigate();
 
   async function uploadCurrentPhoto(photo: File) {
     const url = await uploadPhoto(photo);
@@ -107,6 +111,34 @@ export default function ProfilePage() {
       </div>
     );
   }
+
+  // function createRoom() {
+  //   window.location.href = `/chat?room=${user.username}`;
+  // }
+
+  const createRoom = async () => {
+    const currentUsername = localStorage.getItem('username');
+    const profileUsername = user.username;
+    
+    if (!currentUsername) {
+      alert('You need to be logged in to start a chat.');
+      return;
+    }
+  
+    const roomId = [currentUsername, profileUsername].sort().join('_');
+    console.log(`Checking if room ${roomId} exists`);
+  
+    const roomExists = await userService.checkRoom(roomId);
+    console.log(`Room exists: ${roomExists}`);
+    
+    if (!roomExists) {
+      console.log(`Creating room ${roomId}`);
+      await userService.createRoom(roomId, currentUsername, profileUsername);
+    }
+    console.log(`Navigating to /chat?room=${roomId}`);
+    navigate(`/chat?room=${roomId}`);
+  };
+  
 
   return (
     <div
@@ -294,8 +326,19 @@ export default function ProfilePage() {
               />
             </div>
           )}
+
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ marginBottom: "50px" }}
+            onClick={createRoom}
+          >
+            Send Message
+          </button>
+
         </div>
       </div>
     </div>
+    
   );
 }

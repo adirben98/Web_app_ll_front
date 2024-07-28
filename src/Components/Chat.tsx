@@ -1,28 +1,29 @@
-// Chat.tsx
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { useSearchParams } from 'react-router-dom';
 import styles from './Chat.module.css';
 
-const socket: Socket = io('https://10.10.248.166');
+const socket: Socket = io('http://localhost:3000');
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<{ username: string; message: string }[]>([]);
   const [input, setInput] = useState('');
-  const [username, setUsername] = useState('');
-  const roomId = "roomIdFromPropsOrState"; // This should be obtained dynamically
+  const username = localStorage.getItem('username') || '';
+  const [searchParams] = useSearchParams();
+  const room = searchParams.get('room');
 
   useEffect(() => {
-    // Retrieve username from local storage
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUsername(storedUsername);
-    } else {
-      // Handle cases where the username is not available
-      console.error("Username not found in local storage");
-    }
+    if (!room) return;
 
-    // Join the room
-    socket.emit('join room', { roomId });
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.emit('join room', room);
+
+    socket.on('previous messages', (prevMessages: { username: string; message: string }[]) => {
+      setMessages(prevMessages);
+    });
 
     socket.on('chat message', (msg: { username: string; message: string }) => {
       setMessages((prevMessages) => [...prevMessages, msg]);
@@ -30,13 +31,17 @@ const Chat: React.FC = () => {
 
     return () => {
       socket.off('chat message');
+      socket.emit('leave room', room);
     };
-  }, [roomId]);
+  }, [room]);
 
   const sendMessage = () => {
-    if (input.trim() && username.trim()) {
-      socket.emit('chat message', { roomId, username, message: input });
+    if (input.trim() && username.trim() && room) {
+      console.log('Sending message:', { username, message: input, room });
+      socket.emit('chat message', { username, message: input, room });
       setInput('');
+    } else {
+      console.log('Message not sent. Check input, username, or room.');
     }
   };
 
@@ -44,7 +49,7 @@ const Chat: React.FC = () => {
     <div className={styles.chatContainer}>
       <div className={styles.messageList}>
         {messages.map((msg, index) => (
-          <div key={index}>
+          <div key={index} className={`${styles.message} ${msg.username === username ? styles.mine : styles.other}`}>
             <strong>{msg.username}:</strong> {msg.message}
           </div>
         ))}

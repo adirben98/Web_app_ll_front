@@ -93,10 +93,12 @@ export default function RegisterForm() {
   const [image, setImage] = React.useState<File>();
 
   const photoGalleryRef = React.useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (UserService.getConnectedUser()) window.location.href = "/";
 
   },[])
+
   return (
     <form onSubmit={handleSubmit(Register)}>
       {error && <span>{error}</span>}
