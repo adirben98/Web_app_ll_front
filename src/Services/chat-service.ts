@@ -1,4 +1,8 @@
 import { apiClient } from "./useAuth";
+export interface IRoom {
+    roomId: string;
+    otherUser: string;
+}
 
 class chatService{
     async checkRoom(roomId: string): Promise<boolean> {
@@ -17,6 +21,10 @@ class chatService{
         } catch (error) {
           console.error('Error creating room:', error);
         }
-}
+    }
+
+     getMyRooms(){
+           return apiClient.get<IRoom[]>(`/rooms/getMyRooms`);
+     }
 }
 export default new chatService();

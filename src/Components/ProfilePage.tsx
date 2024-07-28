@@ -11,9 +11,9 @@ import { IUser } from "../Services/auth-service";
 import avatar from "../assets/avatar.png";
 import userService from "../Services/user-service";
 import recipeService from "../Services/recipe-service";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import chatService from "../Services/chat-service";
-
+import MyMessageList from "./MyMessageList";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<string>("myRecipes");
@@ -55,7 +55,7 @@ export default function ProfilePage() {
     photoGalleryRef.current?.click();
   }
 
-  function logout(){
+  function logout() {
     userService.logout();
     window.location.href = "/login";
   }
@@ -123,20 +123,20 @@ export default function ProfilePage() {
   // }
 
   const createRoom = async () => {
-    const currentUsername = localStorage.getItem('username');
+    const currentUsername = userService.getConnectedUser()?.username;
     const profileUsername = user.username;
-    
+
     if (!currentUsername) {
-      alert('You need to be logged in to start a chat.');
+      alert("You need to be logged in to start a chat.");
       return;
     }
-  
-    const roomId = [currentUsername, profileUsername].sort().join('_');
+
+    const roomId = [currentUsername, profileUsername].sort().join("_");
     console.log(`Checking if room ${roomId} exists`);
-  
+
     const roomExists = await chatService.checkRoom(roomId);
     console.log(`Room exists: ${roomExists}`);
-    
+
     if (!roomExists) {
       console.log(`Creating room ${roomId}`);
       await chatService.createRoom(roomId, currentUsername, profileUsername);
@@ -144,7 +144,6 @@ export default function ProfilePage() {
     console.log(`Navigating to /chat?room=${roomId}`);
     navigate(`/chat?room=${roomId}`);
   };
-  
 
   return (
     <div
@@ -276,6 +275,23 @@ export default function ProfilePage() {
                         </button>
                       </li>
                     )}
+                    {currentUser?.username === user.username && (
+                      <li className="nav-item" role="presentation">
+                        <button
+                          className={`nav-link px-4 ${
+                            activeTab === "messages" ? "active" : ""
+                          }`}
+                          onClick={() => setActiveTab("messages")}
+                          role="tab"
+                          tabIndex={-1}
+                        >
+                          <span className="d-block d-sm-none">
+                            <i className="fas fa-home"></i>
+                          </span>
+                          <span className="d-none d-sm-block">My Conversations</span>
+                        </button>
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>
@@ -328,6 +344,13 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
+          {activeTab === "messages" && (
+            <div className="tab-pane fade show active">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                <MyMessageList />
+              </div>
+            </div>
+          )}
 
           {activeTab === "Edit" && (
             <div className="tab-pane fade show active">
@@ -339,19 +362,18 @@ export default function ProfilePage() {
               />
             </div>
           )}
-
-          <button
-            type="button"
-            className="btn btn-primary"
-            style={{ marginBottom: "50px" }}
-            onClick={createRoom}
-          >
-            Send Message
-          </button>
-
+          {currentUser?.username !== user.username && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ marginBottom: "50px" }}
+              onClick={createRoom}
+            >
+              Send Message
+            </button>
+          )}
         </div>
       </div>
     </div>
-    
   );
 }

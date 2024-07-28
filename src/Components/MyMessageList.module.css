@@ -1,0 +1,67 @@
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  margin-top: 70px; 
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px; 
+  position: fixed;
+  top: 70px; 
+  left: 0; 
+  height: calc(100vh - 70px); 
+  overflow-y: auto; 
+  display: flex;
+  flex-direction: column;
+}
+
+.toggleButton {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.toggleButton:hover {
+  background-color: #0056b3;
+}
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.roomList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.roomItem {
+  padding: 15px 20px; 
+  font-size: 18px; 
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.roomItem:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.roomItem:active {
+  background-color: #e0e0e0;
+}
