@@ -12,6 +12,7 @@ import avatar from "../assets/avatar.png";
 import userService from "../Services/user-service";
 import recipeService from "../Services/recipe-service";
 import { useNavigate } from 'react-router-dom';
+import chatService from "../Services/chat-service";
 
 
 export default function ProfilePage() {
@@ -133,12 +134,12 @@ export default function ProfilePage() {
     const roomId = [currentUsername, profileUsername].sort().join('_');
     console.log(`Checking if room ${roomId} exists`);
   
-    const roomExists = await userService.checkRoom(roomId);
+    const roomExists = await chatService.checkRoom(roomId);
     console.log(`Room exists: ${roomExists}`);
     
     if (!roomExists) {
       console.log(`Creating room ${roomId}`);
-      await userService.createRoom(roomId, currentUsername, profileUsername);
+      await chatService.createRoom(roomId, currentUsername, profileUsername);
     }
     console.log(`Navigating to /chat?room=${roomId}`);
     navigate(`/chat?room=${roomId}`);
