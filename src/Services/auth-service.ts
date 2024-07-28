@@ -1,5 +1,7 @@
 import { CredentialResponse } from "@react-oauth/google";
 import {apiClient} from "./useAuth";
+import avatar from "../assets/avatar.png";
+
 
 export interface IUser {
   email: string;
@@ -30,10 +32,10 @@ class registerService {
 
   registrUser = (user: IUser) => {
     return new Promise<IUser>((resolve, reject) => {
+      if(user.image === "") user.image = avatar;
       apiClient
         .post("/auth/register", user)
         .then((response) => {
-          console.log(response);
           const data = response.data;
           this.setLocalStorage(data);
   
@@ -80,7 +82,6 @@ class registerService {
       apiClient
         .post<IUser>("/auth/login", { email: email, password: password })
         .then((response) => {
-          console.log(response);
           const data = response.data;
           this.setLocalStorage(data);
           resolve(data);
@@ -102,7 +103,7 @@ class registerService {
         })
         .then((response) => {
           this.setLocalStorage(response.data);
-          console.log(response);
+          console.log(response.data);
           resolve(response.data);
         })
         .catch((error) => {

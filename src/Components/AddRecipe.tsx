@@ -2,7 +2,7 @@ import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import bread from "../assets/bread.jpeg";
+import example from "../assets/example.png";
 import { IRecipe } from "./Recipe";
 import useAuth, { CanceledError } from "../Services/useAuth";
 import User from "../Services/user-service";
@@ -52,10 +52,15 @@ export default function AddRecipe() {
       setError("category", { message: "Category is required" });
       return false;
     }
+    
+    else if (image === undefined) {
+      setError("image", { message: "Image is required" });
+      return false;
+    }
     return true;
   }
 
-  const user = User.getConnectedUser();
+  const user = User.getConnectedUser()!;
 
   async function onSubmit() {
     console.log(ingredients);
@@ -63,7 +68,7 @@ export default function AddRecipe() {
     if (inputValid()) {
       let imageUrl;
       if (image) imageUrl = await uploadPhoto(image!);
-      else imageUrl = bread;
+      else imageUrl = example;
 
       const newRecipe: IRecipe = {
         name: watch("name"),
@@ -100,7 +105,7 @@ export default function AddRecipe() {
         .then((Categories) => {
           const arr = [];
           for (let i = 0; i < Categories.data.length; i++) {
-            arr.push({ value: Categories.data[i], label: Categories.data[i] });
+            arr.push({ value: Categories.data[i].name, label: Categories.data[i].name });
           }
           setOptions(arr);
         })
@@ -148,18 +153,39 @@ export default function AddRecipe() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          minHeight: "100vh",
+          padding: "20px",
+          backgroundColor: "#f9f9f9"
         }}
       >
-        <div style={{ width: "300px", textAlign: "center" }}>
-          <h1 style={{ marginBottom: "50px" }}>New Recipe</h1>
-          <div style={{ marginBottom: "20px" }}>
+        <div style={{
+          width: "100%",
+          backgroundColor: "#fff",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          padding: "20px",
+          margin: "0 auto",
+          maxWidth: "1000px"
+        }}>
+          <h1 style={{ marginBottom: "20px", fontSize: "24px", fontWeight: "600", color: "#333" }}>New Recipe</h1>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
             <img
-              src={image ? URL.createObjectURL(image) : bread}
-              style={{ width: "100%", margin: "10px" }}
+              src={image ? URL.createObjectURL(image) : example}
+              style={{
+                width: "100%",
+                maxHeight: "300px",
+                objectFit: "contain",
+                borderRadius: "8px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                margin: "10px 0"
+              }}
+              alt="Recipe"
             />
+            {errors.image && <span style={{ color: "red" }}>{errors.image.message}</span>}
+
           </div>
-          <div style={{ marginRight: "300px" }}>
-            <button type="button" className="btn" onClick={handleClick}>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <button type="button" className="btn btn-outline-secondary" onClick={handleClick} style={{ borderRadius: "50%", padding: "10px" }}>
               <FontAwesomeIcon icon={faImage} className="fa-xl" />
             </button>
             <input
@@ -173,17 +199,17 @@ export default function AddRecipe() {
               }}
             />
           </div>
-
           <div className="form-floating mb-3">
             <input
-              type="name"
+              type="text"
               className="form-control"
               id="name"
               placeholder="Recipe Name"
               {...register("name", { required: "Recipe name is required" })}
+              style={{ borderRadius: "8px", padding: "15px", paddingTop: "30px" }}
             />
             <label htmlFor="name">Recipe Name</label>
-            {errors.name && <span>{errors.name.message}</span>}
+            {errors.name && <span style={{ color: "red" }}>{errors.name.message}</span>}
           </div>
           <div className="form-group mb-3">
             <select
@@ -194,8 +220,9 @@ export default function AddRecipe() {
                 setCategory(selectedOption.target.value);
               }}
               ref={selectRef}
+              style={{ borderRadius: "8px", padding: "10px" }}
             >
-              <option value="">Select Category</option>
+              <option  value="">Select Category</option>
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -203,44 +230,45 @@ export default function AddRecipe() {
               ))}
             </select>
             {errors.category && (
-              <p className="text-danger">{errors.category.message}</p>
+              <p style={{ color: "red" }}>{errors.category.message}</p>
             )}
           </div>
           <div className="form-floating mb-3">
             <input
-              type="ingredients"
+              type="text"
               className="form-control"
               id="ingredients"
-              placeholder="ingredients"
-              {...register("ingredients", {
-                required: "Ingredients are required",
-              })}
+              placeholder="Ingredients"
+              {...register("ingredients", { required: "Ingredients are required" })}
               onChange={(e) => setIngredient(e.target.value)}
+              style={{ borderRadius: "8px", padding: "15px", paddingTop: "30px" }}
             />
             <label htmlFor="ingredients">Ingredients</label>
-            {errors.ingredients && <span>{errors.ingredients.message}</span>}
+            {errors.ingredients && <span style={{ color: "red" }}>{errors.ingredients.message}</span>}
             <button
               type="button"
               className="btn btn-secondary mt-2"
               onClick={handleAddIngredient}
-              style={{ marginRight: "300px" }}
+              style={{ borderRadius: "8px", padding: "10px" }}
             >
               Add Ingredient
             </button>
             {ingredients.length > 0 && (
-              <ul className="list-group mt-3">
+              <ul className="list-group mt-3" style={{ paddingLeft: "0" }}>
                 {ingredients.map((item, index) => (
                   <li
                     key={index}
                     className="list-group-item d-flex justify-content-between align-items-center"
+                    style={{ borderRadius: "8px", marginBottom: "5px" }}
                   >
                     {item}
                     <button
                       type="button"
                       className="btn btn-danger btn-sm"
                       onClick={() => handleRemoveIngredient(index)}
+                      style={{ borderRadius: "50%", padding: "5px 10px" }}
                     >
-                      Remove
+                      &times;
                     </button>
                   </li>
                 ))}
@@ -252,33 +280,29 @@ export default function AddRecipe() {
               className="form-control"
               id="instructions"
               placeholder="Instructions"
-              {...register("instructions", {
-                required: "Instructions are required",
-              })}
+              {...register("instructions", { required: "Instructions are required" })}
               onInput={handleTextareaChange}
-              style={{ overflow: "hidden" }}
+              style={{ borderRadius: "8px", padding: "15px", paddingTop: "30px", height: "100px" }}
             />
             <label htmlFor="instructions">Instructions</label>
-            {errors.instructions && <span>{errors.instructions.message}</span>}
+            {errors.instructions && <span style={{ color: "red" }}>{errors.instructions.message}</span>}
           </div>
           <div className="form-floating mb-3">
             <textarea
               className="form-control"
               id="description"
               placeholder="Description"
-              {...register("description", {
-                required: "Description is required",
-              })}
+              {...register("description", { required: "Description is required" })}
               onInput={handleTextareaChange}
-              style={{ overflow: "hidden" }}
+              style={{ borderRadius: "8px", padding: "15px", paddingTop: "30px", height: "100px" }}
             />
             <label htmlFor="description">Description</label>
-            {errors.description && <span>{errors.description.message}</span>}
+            {errors.description && <span style={{ color: "red" }}>{errors.description.message}</span>}
           </div>
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ marginBottom: "50px" }}
+            style={{ width: "100%", padding: "10px", borderRadius: "8px" }}
           >
             Submit
           </button>
@@ -286,4 +310,4 @@ export default function AddRecipe() {
       </div>
     </form>
   );
-}
+}  

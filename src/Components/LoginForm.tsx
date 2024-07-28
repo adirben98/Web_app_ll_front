@@ -3,6 +3,8 @@ import registerService, { IUser } from "../Services/auth-service";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useEffect } from "react";
 import UserService from "../Services/user-service";
+import backgroundImage from "../assets/background.png";
+
 
 export default function LoginForm() {
   function login() {
@@ -44,13 +46,41 @@ export default function LoginForm() {
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
+          width: "100vw",
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          padding: "20px",
         }}
       >
-        <div className="login-form" style={{ width: "300px" }}>
-          <h1 style={{ textAlign: "center", marginBottom: "50px" }}>
-            Welcome!
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            borderRadius: "15px",
+            boxShadow: "0 0 15px rgba(0, 0, 0, 0.2)",
+            width: "500px",  
+            height: "600px", 
+            padding: "30px",
+          }}
+        >
+          <h1
+            style={{
+              fontFamily: "'Courier New', Courier, monospace",
+              fontWeight: "bold",
+              fontSize: "2.5rem", 
+              marginTop: "30px",
+              marginBottom: "30px",
+              textAlign: "center",
+            }}
+          >
+            Welcome<br/>
+        
+            to YumMe!
           </h1>
-          <div className="form-floating mb-3">
+          <div className="form-floating mb-4">
             <input
               type="email"
               className="form-control"
@@ -61,7 +91,7 @@ export default function LoginForm() {
             <label htmlFor="email">Email</label>
             {errors.email && <span>{errors.email.message}</span>}
           </div>
-          <div className="form-floating">
+          <div className="form-floating mb-4">
             <input
               type="password"
               className="form-control"
@@ -75,12 +105,14 @@ export default function LoginForm() {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "space-between", 
               alignItems: "center",
-              marginTop: "25px",
+              height: "70px",
             }}
           >
-            <button className="btn btn-primary ">Login</button>
+            <button className="btn btn-primary" style={{ fontSize: "1rem" }}>
+              Login
+            </button>
             <GoogleLogin onSuccess={onSuccess} />
           </div>
         </div>

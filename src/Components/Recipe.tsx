@@ -74,12 +74,15 @@ export default function Recipe() {
       window.location.href = "/404";
       console.log(error);
     }
-    const user=userService.getConnectedUser();
-    if(user.username===recipe.author){
-      setIsTheAuthor(true);
-    }
+    const user=userService.getConnectedUser()!;
+    
     getRecipe
-      .then((recipe) => setRecipe(recipe.data))
+      .then((recipe) => {
+        setRecipe(recipe.data)
+        if(user.username===recipe.data.author){
+          setIsTheAuthor(true);
+        }
+      })
       .catch((error) => {
         errorHandler(error);
     });
@@ -246,7 +249,7 @@ export default function Recipe() {
   </div>
 </div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          {userService.getConnectedUser().username !== recipe.author && (
+          {userService.getConnectedUser()!.username !== recipe.author && (
             <button
               type="button"
               className="btn"
@@ -280,7 +283,7 @@ export default function Recipe() {
       </div>
       <h2 style={{ marginTop: "50px", textAlign: "center" }}>Comments</h2>
       <CommentCreate
-        author={userService.getConnectedUser().username!}
+        author={userService.getConnectedUser()!.username!}
         recipeId={`${id}`}
         handle={() => setRenderNeeded(!renderNeeded)}
       />

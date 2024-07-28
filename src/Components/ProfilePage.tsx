@@ -54,6 +54,11 @@ export default function ProfilePage() {
     photoGalleryRef.current?.click();
   }
 
+  function logout(){
+    userService.logout();
+    window.location.href = "/login";
+  }
+
   const errorHandler = (error: unknown) => {
     if (error instanceof CanceledError) return;
     window.location.href = "/404";
@@ -64,7 +69,7 @@ export default function ProfilePage() {
     const { User, cancelUser } = userService.getUser(name!);
     const { userRecipesAndFavorites, cancelUserRecipesAndFavorites } =
       recipeService.getUserRecipesAndFavorites(name!);
-      setCurrentUser(userService.getConnectedUser())
+    setCurrentUser(userService.getConnectedUser());
 
     async function fetchProfile() {
       User.then((res) => {
@@ -150,8 +155,15 @@ export default function ProfilePage() {
         style={{ width: "100%", maxWidth: "1000px" }}
       >
         <div className="card">
-          { currentUser?.username=== user.username && (
+          {currentUser?.username === user.username && (
             <div className="d-flex justify-content-end">
+              <span
+                className="text-primary cursor-pointer"
+                onClick={() => logout()}
+                style={{ cursor: "pointer", padding: "10px" }}
+              >
+                Logout
+              </span>
               <span
                 className="text-primary cursor-pointer"
                 onClick={() => setActiveTab("Edit")}
@@ -285,7 +297,7 @@ export default function ProfilePage() {
                     style={{ flex: "1 1 calc(33.333% - 10px)" }}
                   >
                     <RecipeRow
-                      id={recipe._id!}
+                      url={`/recipe/${recipe._id!}`}
                       recipeImg={recipe.image}
                       recipeName={recipe.name}
                       description={recipe.description}
@@ -305,7 +317,7 @@ export default function ProfilePage() {
                     style={{ flex: "1 1 calc(33.333% - 10px)" }}
                   >
                     <RecipeRow
-                      id={recipe._id!}
+                      url={`/recipe/${recipe._id!}`}
                       recipeImg={recipe.image}
                       recipeName={recipe.name}
                       description={recipe.description}

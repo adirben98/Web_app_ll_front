@@ -4,10 +4,14 @@ import { IUser } from "./auth-service";
 class userService {
   getConnectedUser() {
     const username = localStorage.getItem("username");
+
     const email = localStorage.getItem("email");
-    const userImg = localStorage.getItem("imgUrl");
+    let userImg = localStorage.getItem("imgUrl");
+    if(!userImg)userImg= "../assets/avatar.png";
+
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
+    if (!username || !email  || !accessToken || !refreshToken) {return null}
 
     const user: IUser = {
       username: username!,
@@ -25,26 +29,17 @@ class userService {
     return { User, cancelUser: () => controller.abort() };
   }
 
-  updateUserImage(image: string) {
-    return apiClient.put(`/auth/updateUserImage`, { imgUrl: image });
+  updateUserImage(image: string){
+    localStorage.setItem("imgUrl", image);
+    return apiClient.put(`/auth/updateUserImage`, {imgUrl:image});
   }
 
-  async checkRoom(roomId: string): Promise<boolean> {
-    try {
-      const response = await apiClient.get(`/rooms/check/${roomId}`);
-      return response.data.exists;
-    } catch (error) {
-      console.error('Error checking room:', error);
-      return false;
-    }
-  }
-
-  async createRoom(roomId: string, user1: string, user2: string): Promise<void> {
-    try {
-      await apiClient.post(`/rooms/create`, { roomId, users: [user1, user2] });
-    } catch (error) {
-      console.error('Error creating room:', error);
-    }
+  logout(){
+    localStorage.removeItem("email");
+    localStorage.removeItem("username");
+    localStorage.removeItem("imgUrl");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   }
 }
 

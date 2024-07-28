@@ -2,47 +2,49 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import useAuth, { CanceledError } from "../Services/useAuth";
 import RecipeRow from "./RecipeRow";
-import { AxiosResponse } from "axios";
 import { IRecipe } from "./Recipe";
+import recipeService from "../Services/recipe-service";
 
- interface SearchPageProps {
-  searchFunction: (query: string) => {
-    results: Promise<AxiosResponse<IRecipe[], unknown>>;
-    cancelSearch: () => void;
-  };
-}
 
-export default function SearchPage({ searchFunction }: SearchPageProps) {
+export default function SearchPage() {
   const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true);
   const [searchResults, setSearchResults] = useState<IRecipe[]>([]);
+  const [categoriesResults, setCategoriesResults] = useState<IRecipe[]>([]);
   const params = new URLSearchParams(location.search);
   const queryParam = params.get("q");
-  const {isLoading} = useAuth();
-
+  const func = params.get("f");
+  const { isLoading } = useAuth();
+  
   useEffect(() => {
-    if (!queryParam) return;
+    if (!queryParam || !func) return;
 
-    const { results, cancelSearch } = searchFunction(queryParam);
+    const { results, cancelSearch } = func === 'search' 
+      ? recipeService.searchRecipes(queryParam) 
+      : recipeService.searchCategory(queryParam);
 
     results
       .then((res) => {
-        setSearchResults(res.data);
+        if (func === 'search') {
+          setSearchResults(res.data);
+        } else {
+          setCategoriesResults(res.data);
+        }
       })
       .catch((error) => {
         if (error instanceof CanceledError) return;
         console.log(error);
       })
       .finally(() => {
-        setLoading(isLoading);
+        setLoading(false);
       });
 
     return () => {
       cancelSearch();
     };
-  }, [queryParam, isLoading]);
+  }, [queryParam, func, isLoading]);
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <div
         style={{
@@ -73,28 +75,6 @@ export default function SearchPage({ searchFunction }: SearchPageProps) {
           maxWidth: "1200px",
         }}
       >
-        {/* <div
-          className="btn-group"
-          style={{ marginRight: "20px", height: "10vh" }}
-        >
-          <button
-            type="button"
-            className="btn btn-primary dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Categories
-          </button>
-          <ul className="dropdown-menu">
-            {categories.map((category) => (
-              <li key={category}>
-                <Link className="dropdown-item" to={"/recipe"}>
-                  {category}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div> */}
         <div
           style={{
             flex: 1,
@@ -108,22 +88,39 @@ export default function SearchPage({ searchFunction }: SearchPageProps) {
             {queryParam}
           </h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
-            {searchResults.map((recipe) => (
-              <div
-                key={recipe._id}
-                style={{
-                  flex: "1 1 calc(33.333% - 10px)",
-                  boxSizing: "border-box",
-                }}
-              >
-                <RecipeRow
+            {func === 'search'
+              ? searchResults.map((recipe) => (
+                  <div
+                    key={recipe._id}
+                    style={{
+                      flex: "1 1 calc(33.333% - 10px)",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <RecipeRow
+                      recipeImg={recipe.image}
+                      url={`/recipe/${recipe._id}`}
+                      description={recipe.description}
+                      recipeName={recipe.name}
+                    />
+                  </div>
+                ))
+              : categoriesResults.map((recipe) => (
+                  <div
+                    key={recipe.name}
+                    style={{
+                      flex: "1 1 calc(33.333% - 10px)",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                  <RecipeRow
                   recipeImg={recipe.image}
-                  id={recipe._id!}
+                  url={`/recipeFromApi/${recipe.name!}`}
                   description={recipe.description}
                   recipeName={recipe.name}
-                />
-              </div>
-            ))}
+                />  
+                  </div>
+                ))}
           </div>
         </div>
       </div>

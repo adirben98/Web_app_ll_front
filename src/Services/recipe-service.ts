@@ -1,5 +1,6 @@
+import { ICategory } from "../Components/ApiCategories";
 import { IRecipe } from "../Components/Recipe";
-import {apiClient} from "./useAuth";
+import { apiClient } from "./useAuth";
 
 interface favoritesAndRecipes {
   favorites: IRecipe[];
@@ -7,9 +8,17 @@ interface favoritesAndRecipes {
 }
 
 class RecipeService {
+  getAll() {
+    const controller = new AbortController();
+    const AllRecipes = apiClient.get<IRecipe[]>("/recipe", {
+      signal: controller.signal,
+    });
+    return { AllRecipes, cancelRecipes: () => controller.abort() };
+  }
+
   getCategories() {
     const controller = new AbortController();
-    const getCategories = apiClient.get<string[]>("/recipe/getCategories", {
+    const getCategories = apiClient.get<ICategory[]>("/recipe/getCategories", {
       signal: controller.signal,
     });
     return { getCategories, cancelCategories: () => controller.abort() };
@@ -108,6 +117,14 @@ class RecipeService {
 
   deleteRecipe(id: string) {
     return apiClient.delete(`/recipe/${id}`);
+  }
+
+  getRecipeFromApi(name: string) {
+    const controller = new AbortController();
+    const getRecipeFromApi = apiClient.get<IRecipe>(`/recipe/recipeFromApi/${name}`, {
+      signal: controller.signal,
+    });
+    return { getRecipeFromApi, cancelRecipeFromApi: () => controller.abort() };
   }
 }
 
