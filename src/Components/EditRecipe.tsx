@@ -7,6 +7,7 @@ import  useAuth, { CanceledError } from "../Services/useAuth";
 import uploadPhoto from "../Services/file-service";
 import { useParams } from "react-router-dom";
 import recipeService from "../Services/recipe-service";
+import userService from "../Services/user-service";
 
 export default function EditRecipe() {
   const [image, setImage] = useState<string>("");
@@ -106,6 +107,9 @@ export default function EditRecipe() {
         }).catch((error) => {errorHandler(error);});
 
         getRecipe.then((res) => {
+        if(userService.getConnectedUser()?.username !== res.data.author) {
+          window.location.href = "/404";
+        }
         setValue("name", res.data.name);
         setValue("author", res.data.author);
         setValue("authorImg", res.data.authorImg);
