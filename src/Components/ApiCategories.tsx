@@ -48,7 +48,7 @@ useEffect(() => {
         );
       }
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', marginTop:"70px" }}>
     <h1>Categories</h1>
     <ul
           style={{

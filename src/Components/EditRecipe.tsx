@@ -171,6 +171,7 @@ export default function EditRecipe() {
           minHeight: "100vh",
           padding: "20px",
           backgroundColor: "#f9f9f9"
+          
         }}
       >
         <div style={{

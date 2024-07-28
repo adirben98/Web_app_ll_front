@@ -92,7 +92,7 @@ export default function Header() {
                   zIndex: 1000,
                 }}
               >
-                {categories.map((category) => (
+                {categories?.map((category) => (
                   <a
                     key={category.name}
                     className="dropdown-item"

@@ -70,7 +70,7 @@ export default function HomePage() {
 
   return (
     <div
-      style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+      style={{ display: "flex", justifyContent: "center", marginTop: "70px" ,background: "#fff"}}
     >
       <div
         style={{
@@ -78,14 +78,14 @@ export default function HomePage() {
           flexDirection: "row",
           width: "100%",
           maxWidth: "1200px",
-          justifyContent: "center",
+          justifyContent: "center",          
+      
         }}
       >
         <div
           style={{
             flex: 1,
             padding: "20px",
-            backgroundColor: "#f9f9f9",
             borderRadius: "8px",
           }}
         >
@@ -95,9 +95,9 @@ export default function HomePage() {
               fontSize: "48px",
               marginTop: "30px",
               marginBottom: "50px",
-              fontFamily: "'Dancing Script', cursive", // Unique font
+              fontFamily: "'Dancing Script', cursive", 
               letterSpacing: "2px",
-              color: "#333", // Adjust color if needed
+              color: "#333", 
             }}
           >
             Welcome to YumMe!
@@ -107,8 +107,8 @@ export default function HomePage() {
               textAlign: "center",
               fontSize: "24px",
               marginBottom: "50px",
-              fontFamily: "'Roboto', sans-serif", // Unique font for the body text
-              color: "#555", // Adjust color if needed
+              fontFamily: "'Roboto', sans-serif", 
+              color: "#555",
             }}
           >
             Let’s Dive into Deliciousness

@@ -155,7 +155,8 @@ export default function AddRecipe() {
           alignItems: "center",
           minHeight: "100vh",
           padding: "20px",
-          backgroundColor: "#f9f9f9"
+          backgroundColor: "#f9f9f9",
+          marginTop: "70px",
         }}
       >
         <div style={{
