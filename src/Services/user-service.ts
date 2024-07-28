@@ -1,4 +1,4 @@
-import {apiClient} from "./useAuth";
+import { apiClient } from "./useAuth";
 import { IUser } from "./auth-service";
 
 class userService {
@@ -19,14 +19,14 @@ class userService {
       image: userImg!,
       accessToken: accessToken!,
       refreshToken: refreshToken!,
-    }
-    return user
+    };
+    return user;
   }
 
-  getUser(name:string){
+  getUser(name: string) {
     const controller = new AbortController();
     const User = apiClient.get<IUser>(`/auth/getUser/${name}`, { signal: controller.signal });
-    return {User, cancelUser:()=>controller.abort()};
+    return { User, cancelUser: () => controller.abort() };
   }
 
   updateUserImage(image: string){
