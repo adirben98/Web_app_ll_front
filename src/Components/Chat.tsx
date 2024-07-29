@@ -3,7 +3,7 @@ import { io, Socket } from "socket.io-client";
 import { useSearchParams } from "react-router-dom";
 import styles from "./Chat.module.css";
 
-const socket: Socket = io("http://localhost:3000");
+const socket: Socket = io("http://193.106.55.166:80");
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<
