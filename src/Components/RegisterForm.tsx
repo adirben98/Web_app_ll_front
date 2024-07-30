@@ -113,7 +113,7 @@ export default function RegisterForm() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "100vh",
+        height: "120vh",
         width: "100vw",
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",
@@ -139,7 +139,7 @@ export default function RegisterForm() {
             fontWeight: "bold",
             padding: "30px",
             fontSize: "2rem",
-            marginBottom: "20px",
+            marginTop: "30px",
             textAlign: "center",
           }}
         >
@@ -223,16 +223,36 @@ export default function RegisterForm() {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              flexDirection: "column",
               alignItems: "center",
               marginTop: "25px",
             }}
           >
-            <button className="btn btn-primary">Register</button>
+            <button className="btn btn-primary" style={{ marginBottom: "10px" }}>
+              Register
+            </button>
             <GoogleLogin onSuccess={onSuccess} onError={onError} />
+            <div style={{ marginTop: "15px" }}>
+              <span>Already have an account? </span>
+              <button
+                onClick={() => {window.location.href = "/login"}}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#007bff",
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  padding: "0",
+                  marginLeft: "5px",
+                }}
+              >
+                Login
+              </button>
+            </div>
           </div>
         </form>
       </div>
     </div>
   );
-}
+}  
