@@ -122,6 +122,8 @@ export default function ProfilePage() {
   //   window.location.href = `/chat?room=${user.username}`;
   // }
 
+  
+
   const createRoom = async () => {
     const currentUsername = userService.getConnectedUser()?.username;
     const profileUsername = user.username;
@@ -173,7 +175,7 @@ export default function ProfilePage() {
               </span>
             </div>
           )}
-
+  
           <div className="card-body pb-0">
             <div className="row align-items-center">
               <div className="col-md-3">
@@ -222,23 +224,41 @@ export default function ProfilePage() {
               </div>
               <div className="col-md-9">
                 <div className="ms-3">
-                  <div className="row my-4">
-                    <div className="col-md-12">
+                  <div className="row my-4 align-items-center">
+                    <div className="col-md-10 d-flex align-items-center">
                       <div>
                         <h4
-                          className="text-primary font-size-20"
+                          className="text-primary font-size-20 mb-0 me-3"
                           style={{ padding: "6px" }}
                         >
                           {user.username}
                         </h4>
-                        <p className="text-muted fw-medium mb-0">
-                          <i className="mdi mdi-email-outline me-2"></i>
-                          {user.email}
-                        </p>
+                        {currentUser?.username !== user.username && (
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            style={{
+                              backgroundColor: "rgb(0, 0, 0)",
+                              border: "none",
+                              borderRadius: "20px", 
+                              padding: "5px 10px",  
+                              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                              fontSize: "12px",  
+                              fontWeight: "bold",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                            onClick={createRoom}
+                          >
+                            Send Message
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
-
+  
                   <ul
                     className="nav nav-tabs nav-tabs-custom border-bottom-0 mt-3 nav-justified"
                     role="tablist"
@@ -299,7 +319,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-
+  
       <div
         className="tab-content-container"
         style={{ width: "100%", maxWidth: "1000px", marginTop: "20px" }}
@@ -324,7 +344,7 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
-
+  
           {activeTab === "foodNow" && (
             <div className="tab-pane fade show active">
               <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
@@ -351,7 +371,7 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
-
+  
           {activeTab === "Edit" && (
             <div className="tab-pane fade show active">
               <ChangePassword
@@ -361,16 +381,6 @@ export default function ProfilePage() {
                 }}
               />
             </div>
-          )}
-          {currentUser?.username !== user.username && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              style={{ marginBottom: "50px" }}
-              onClick={createRoom}
-            >
-              Send Message
-            </button>
           )}
         </div>
       </div>

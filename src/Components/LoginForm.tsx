@@ -61,8 +61,8 @@ export default function LoginForm() {
             backgroundColor: "rgba(255, 255, 255, 0.9)",
             borderRadius: "15px",
             boxShadow: "0 0 15px rgba(0, 0, 0, 0.2)",
-            width: "500px",  
-            height: "600px", 
+            width: "500px",
+            height: "auto",
             padding: "30px",
           }}
         >
@@ -70,14 +70,13 @@ export default function LoginForm() {
             style={{
               fontFamily: "'Courier New', Courier, monospace",
               fontWeight: "bold",
-              fontSize: "2.5rem", 
+              fontSize: "2.5rem",
               marginTop: "30px",
               marginBottom: "30px",
               textAlign: "center",
             }}
           >
-            Welcome<br/>
-        
+            Welcome<br />
             to YumMe!
           </h1>
           <div className="form-floating mb-4">
@@ -102,18 +101,27 @@ export default function LoginForm() {
             <label htmlFor="password">Password</label>
             {errors.password && <span>{errors.password.message}</span>}
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between", 
-              alignItems: "center",
-              height: "70px",
-            }}
-          >
-            <button className="btn btn-primary" style={{ fontSize: "1rem" }}>
-              Login
+          <button className="btn btn-primary" style={{ fontSize: "1rem", width: "100%", marginBottom: "15px" }}>
+            Login
+          </button>
+          <GoogleLogin onSuccess={onSuccess} />
+          <div style={{ marginTop: "15px", textAlign: "center" }}>
+            <span>Don't have an account? </span>
+            <button
+              onClick={() => { window.location.href = "/register" }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#007bff",
+                fontSize: "1rem",
+                cursor: "pointer",
+                textDecoration: "underline",
+                padding: "0",
+                marginLeft: "5px",
+              }}
+            >
+              Register
             </button>
-            <GoogleLogin onSuccess={onSuccess} />
           </div>
         </div>
       </div>
