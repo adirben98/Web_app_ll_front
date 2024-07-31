@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useSearchParams } from "react-router-dom";
 import styles from "./Chat.module.css";
+import userService from "../Services/user-service";
 
 const socket: Socket = io("https://193.106.55.166:80");
 
@@ -10,9 +11,10 @@ const Chat: React.FC = () => {
     { username: string; message: string }[]
   >([]);
   const [input, setInput] = useState("");
-  const username = localStorage.getItem("username") || "";
+  const username = userService.getConnectedUser()?.username || "";
   const [searchParams] = useSearchParams();
   const room = searchParams.get("room");
+  const ref= useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!room) window.location.href = "/404";
@@ -63,7 +65,18 @@ const Chat: React.FC = () => {
               msg.username === username ? styles.mine : styles.other
             }`}
           >
-            <strong>{msg.username}:</strong> {msg.message}
+            <strong
+            ref={ref}
+              onClick={() => {
+                if (msg.username !== username) {
+                  window.location.href = `/profile/${msg.username}`;
+                  ref.current?.style.setProperty("cursor", "pointer");
+                }
+              }}
+            >
+              {msg.username}:
+            </strong>{" "}
+            {msg.message}
           </div>
         ))}
       </div>
