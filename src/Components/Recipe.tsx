@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useAuth, { CanceledError } from "../Services/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPenToSquare,
+  faThumbsUp,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import Comment, { IComment } from "./Comment";
 import CommentCreate from "./CommentCreation";
 import userService from "../Services/user-service";
@@ -57,7 +61,8 @@ export default function Recipe() {
       })
       .catch((error) => {
         console.log(error);
-      });}
+      });
+  }
 
   useEffect(() => {
     const link = document.createElement("link");
@@ -74,19 +79,19 @@ export default function Recipe() {
       window.location.href = "/404";
       console.log(error);
     }
-    const user=userService.getConnectedUser()!;
-    
+    const user = userService.getConnectedUser()!;
+
     getRecipe
       .then((recipe) => {
-        setRecipe(recipe.data)
-        if(user.username===recipe.data.author){
+        setRecipe(recipe.data);
+        if (user.username === recipe.data.author) {
           setIsTheAuthor(true);
         }
       })
       .catch((error) => {
         errorHandler(error);
-    });
-  
+      });
+
     comments
       .then((comments) => setComments(comments.data))
       .catch((error) => {
@@ -167,12 +172,12 @@ export default function Recipe() {
         fontFamily: "'Open Sans', sans-serif",
         backgroundColor: "#ffffff",
         padding: "20px",
-        minHeight: "100vh", 
+        minHeight: "100vh",
       }}
     >
       <div
         style={{
-          height: "400px", 
+          height: "400px",
           width: "100%",
           display: "flex",
           alignItems: "center",
@@ -191,38 +196,40 @@ export default function Recipe() {
         />
       </div>
       <div>
-          <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>
-            {recipe.name}
-          </h2>
-          {istheAuthor && (
-             <div style={{ display: "flex", alignItems: "center" }}>
-             <button
-               type="button"
-               className="btn"
-               onClick={() => {
+        <h2 style={{ fontWeight: "bolder", margin: "10px 0" }}>
+          {recipe.name}
+        </h2>
+        {istheAuthor && (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
                 window.location.href = `/editRecipe/${id}`;
-               }}
-               style={{ marginRight: "10px" }}
-             >
-               <FontAwesomeIcon
-                 icon={faPenToSquare}
-                 className="fa-xl tinted-icon"
-               />
-             </button>
-             <button
-               type="button"
-               className="btn"
-               onClick={() => {
-                 deleteRecipe();
-               }}
-               style={{ marginRight: "10px" }}
-             >
-               <FontAwesomeIcon icon={faTrash} className="fa-xl tinted-icon" />
-             </button>
-           </div>
-    )}
+              }}
+              style={{ marginRight: "10px" }}
+            >
+              <FontAwesomeIcon
+                icon={faPenToSquare}
+                className="fa-xl tinted-icon"
+              />
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                deleteRecipe();
+              }}
+              style={{ marginRight: "10px" }}
+            >
+              <FontAwesomeIcon icon={faTrash} className="fa-xl tinted-icon" />
+            </button>
+          </div>
+        )}
       </div>
-      <p style={{ margin: "10px 0", textAlign: "center" }}>{recipe.description}</p>
+      <p style={{ margin: "10px 0", textAlign: "center" }}>
+        {recipe.description}
+      </p>
       <div
         style={{
           display: "flex",
@@ -232,22 +239,43 @@ export default function Recipe() {
           margin: "20px 0",
         }}
       >
-      <div style={{ display: "flex", alignItems: "center" }}>
-  <img
-    src={recipe.authorImg}
-    style={{ borderRadius: "50%", width: "50px", height: "50px", cursor: "pointer" }}
-    alt="Author"
-    onClick={() => window.location.href = `/profile/${recipe.author}`}
-  />
-  <h3 style={{ marginLeft: "10x" }}>{recipe.author}</h3>
-  <div style={{ display: "flex", alignItems: "center", marginLeft: "10px" }}>
-    <span style={{ margin: "0 10px" }}>|</span>
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <h5 style={{ fontSize: "14px", fontWeight: "bold", margin: 0 }}>Created At:</h5>
-      <p style={{ fontSize: "12px", fontWeight: "bold", margin: "0 0 0 10px" }}>{recipe.createdAt}</p>
-    </div>
-  </div>
-</div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img
+            src={recipe.authorImg}
+            style={{
+              borderRadius: "50%",
+              width: "50px",
+              height: "50px",
+              cursor: "pointer",
+            }}
+            alt="Author"
+            onClick={() => (window.location.href = `/profile/${recipe.author}`)}
+          />
+          <h3 style={{ marginLeft: "10x" }}>{recipe.author}</h3>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginLeft: "10px",
+            }}
+          >
+            <span style={{ margin: "0 10px" }}>|</span>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <h5 style={{ fontSize: "14px", fontWeight: "bold", margin: 0 }}>
+                Created At:
+              </h5>
+              <p
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  margin: "0 0 0 10px",
+                }}
+              >
+                {recipe.createdAt}
+              </p>
+            </div>
+          </div>
+        </div>
         <div style={{ display: "flex", alignItems: "center" }}>
           {userService.getConnectedUser()!.username !== recipe.author && (
             <button
@@ -301,6 +329,6 @@ export default function Recipe() {
           />
         ))}
       </div>
- </div>
-);
+    </div>
+  );
 }
